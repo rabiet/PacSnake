@@ -2,7 +2,7 @@
 
 ## Spezifikation
 * Snake im PacMan-Feld
-  * Schlange bewegt sich durch ein vordefiniertes Feld
+  * Schlange bewegt sich durch ein vordefiniertes Feld (aus Textdatei)
     * Aufgabe ist Punkte zu fressen
   * Dadurch wird die Schlange länger
   * Schlange hält nicht an und kann nicht durch Wände gehen
@@ -16,6 +16,7 @@
     * Langsamer werden
     * Schneller werden
     * Alle Geister in die Mitte setzen
+    * Umdrehen
 
 ## Design
 ### (i) Programmstruktur
@@ -30,17 +31,17 @@ int gameTick();
 
 #### Bewegt die Schlange um ein Feld nach vorne.
 ``` c
-struct Player movePlayer(struct Player p);
+void movePlayer(struct Player *p);
 ```
 
 #### Bewegt den übergebenen Geist.
 ``` c
-struct Ghost moveGhost(struct Ghost g);
+void moveGhost(struct Ghost *g);
 ``` 
 
 #### Wendet ein Powerup an. Zu fressende Punkte werden ebenfalls als Powerup angesehen.
 ``` c
-void takePowerup(struct PowerUp p);
+void takePowerup(struct PowerUp *p);
 ``` 
 
 ### (iii) zentrale Datentypen
@@ -49,7 +50,7 @@ void takePowerup(struct PowerUp p);
 struct PowerUp {
   int id;
   int time;
-  Position pos;
+  struct Position pos;
 };
 ```
 
@@ -65,23 +66,23 @@ struct Position {
 ``` c
 struct Player {
   int length;
-  Position head;
-  tail t;
+  struct Position head;
+  struct Tail *t;
 };
 ```
 
 #### Alle Elemente der Schlange (außer dem Kopf)
 ``` c
 struct Tail {
-  Position pos;
-  Tail t;
+  struct Position pos;
+  struct Tail *t;
 };
 ``` 
 
 #### Geister/Gegner
 ``` c
 struct Ghost {
-  Position pos;
+  struct Position pos;
   int direction;
 };
 ``` 
