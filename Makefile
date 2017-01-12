@@ -6,8 +6,8 @@ LDFLAGS=-L".\SDL2\x86_64-w64-mingw32\lib" -lmingw32 -lSDL2main -lSDL2 -lopengl32
 
 all: run
 
-testSDL.exe:
-	$(CC) $(CFLAGS) -o testSDL.exe testSDL.c $(LDFLAGS)
+PacSnake.exe:
+	$(CC) $(CFLAGS) -o PacSnake.exe PacSnake.c Ghosts.c $(LDFLAGS)
 
-run: testSDL.exe
-	testSDL.exe
+run: PacSnake.exe
+	PacSnake.exe
