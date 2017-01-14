@@ -9,7 +9,7 @@ enum PowerUpType {
     FASTER,
     GHOSTS_TO_CENTER,
     TURNAROUND
-}
+};
 
 struct PowerUp {
   int id;
