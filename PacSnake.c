@@ -4,6 +4,7 @@
 #include "PowerUps.h"
 #include "Player.h"
 #include "Position.h"
+#include "MapLoader.h"
 
 int gameTick(){
 
@@ -22,6 +23,12 @@ int main(int argc, char const *argv[]) {
             y: 5
         }
     };
+
+    struct Map *map = loadMap();
+    if(map == NULL){
+        return -1;
+    }
+    printMapToConsole(map);
 
     moveGhost(&g);
     moveGhostHome(&g);
