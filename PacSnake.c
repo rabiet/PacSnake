@@ -1,7 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "Ghosts.h"
+#include "PowerUps.h"
+#include "Player.h"
 #include "Position.h"
+
+int gameTick(){
+
+}
 
 int main(int argc, char const *argv[]) {
     struct Ghost g = {
