@@ -10,7 +10,9 @@ enum Direction {
     UP,
     DOWN,
     LEFT,
-    RIGTH
+    RIGHT
 };
+
+int comparePositions(struct Position *pos, struct Position *pos2);
 
 #endif

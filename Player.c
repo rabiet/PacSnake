@@ -13,8 +13,23 @@ void printPlayerPos(struct Player *player){
     }
 }
 
+int isTailPos(struct Tail *tail, struct Position pos){
+    while(tail && !comparePositions(&tail->pos, &pos)) {
+        tail = tail->tail;
+    }
+
+    return tail ? comparePositions(&tail->pos, &pos) : 0;
+}
+
+int isPlayerPos(struct Player *player, struct Position pos){
+    if(comparePositions(&player->head, &pos)){
+        return 1;
+    }
+
+    return isTailPos(player->tail, pos);
+}
+
 void movePlayer(struct Player *player, struct GameState *game){
-    //TODO test if it kills the player
     struct Position oldPos = player->head;
     printPlayerPos(player);
 
@@ -28,9 +43,14 @@ void movePlayer(struct Player *player, struct GameState *game){
         case LEFT:
             player->head.y++;
             break;
-        case RIGTH:
+        case RIGHT:
             player->head.y--;
             break;
+    }
+
+    if(isWall(game->map, player->head) || isTailPos(game->player->tail, player->head)){
+        //TODO: indicate the end of the game
+        printf("%s\n", "This would kill the player!");
     }
 
     struct Tail *tail = player->tail;

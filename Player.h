@@ -5,6 +5,8 @@
 #include "Position.h"
 #include "PacSnake.h"
 
+int isPlayerPos(struct Player *player, struct Position pos);
+
 void movePlayer(struct Player *player, struct GameState *game);
 
 void turnPlayer(struct Player *player, enum Direction direction);

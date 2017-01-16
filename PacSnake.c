@@ -61,7 +61,8 @@ int main(int argc, char const *argv[]) {
             x: 2,
             y: 3
         },
-        tail: &tail2
+        tail: &tail2,
+        direction: RIGHT
     };
 
     struct GameState game = {

@@ -75,18 +75,6 @@ struct Map* loadMap() {
             case '#':
                 map[row * width + col] = WALL;
                 break;
-
-            case 'P':
-                map[row * width + col] = PLAYER;
-                break;
-
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-                map[row * width + col] = GHOST;
-                break;
-
             default:
                 map[row * width + col] = FREE;
                 break;
@@ -111,3 +99,7 @@ void unloadMap(struct Map *map) {
     free(map->fields);
     free(map);
 }
+
+int isWall(struct Map *map, struct Position pos){
+    return map->fields[map->width * pos.x + pos.y] == WALL;
+};
