@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include "Ghosts.h"
 
-void moveGhost(struct Ghost *ghost){
+void moveGhost(struct Ghost *ghost, struct GameState *game) {
+    struct Position *playerPos = &game->player->head;
+
     switch (ghost->type) {
         case BLINKY:
             printf("%s\n", "Blinky");
@@ -19,6 +21,6 @@ void moveGhost(struct Ghost *ghost){
     }
 }
 
-void moveGhostHome(struct Ghost *ghost){
+void moveGhostHome(struct Ghost *ghost, struct GameState *game) {
     ghost->pos = ghost->homePos;
 }

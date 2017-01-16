@@ -1,19 +1,16 @@
 #ifndef _player_h
 #define _player_h
 
+#include "Player_structs.h"
 #include "Position.h"
+#include "PacSnake.h"
 
-struct Player {
-  int length;
-  struct Position head;
-  struct Tail *t;
-};
+void movePlayer(struct Player *player, struct GameState *game);
 
-struct Tail {
-  struct Position pos;
-  struct Tail *t;
-};
+void turnPlayer(struct Player *player, enum Direction direction);
 
-void movePlayer(struct Player *player);
+void addTail(struct Player *player, struct Tail *newTail);
+
+void printPlayerPos(struct Player *player);
 
 #endif

@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "MapLoader.h"
+#include "Map.h"
 
 /*
  * prints the map to the console (it does not look nice ;) )

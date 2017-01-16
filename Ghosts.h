@@ -1,24 +1,10 @@
 #ifndef _ghosts_h
 #define _ghosts_h
 
-#include "Position.h"
+#include "Ghosts_structs.h"
+#include "PacSnake.h"
 
-// http://mentalfloss.com/uk/games/31287/the-different-strategies-of-each-of-pac-mans-ghosts
-enum GhostType {
-    BLINKY,
-    PINKY,
-    CLYDE,
-    INKY
-};
-
-struct Ghost {
-    struct Position pos;
-    enum Direction direction;
-    enum GhostType type;
-    struct Position homePos;
-};
-
-void moveGhost(struct Ghost *ghost);
-void moveGhostHome(struct Ghost *ghost);
+void moveGhost(struct Ghost *ghost, struct GameState *game);
+void moveGhostHome(struct Ghost *ghost, struct GameState *game);
 
 #endif

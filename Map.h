@@ -1,5 +1,5 @@
-#ifndef _maploader_h
-#define _maploader_h
+#ifndef _map_h
+#define _map_h
 
 enum MapFieldTypes {
     WALL,
