@@ -6,12 +6,19 @@
 #include "Player.h"
 #include "Position.h"
 #include "Map.h"
+#include <stdbool.h>
+
+#include <SDL2/SDL.h>
 
 int gameTick(){
 
 }
 
-int main(int argc, char const *argv[]) {
+void printMapToSDL(struct Map *map) {
+    
+}
+
+int main(int argc, char **argv) {
     struct Ghost g = {
         pos: {
             x: 1,
@@ -71,6 +78,41 @@ int main(int argc, char const *argv[]) {
         player: &player
     };
 
+    const int width = 20 * map->width;
+    const int height = 20 * map->length;
+
+    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Window *window = SDL_CreateWindow("PacSnake", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_OPENGL);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+    bool running = true;
+    SDL_Event event;
+    while (running)
+    {
+        while (SDL_PollEvent(&event))
+        {
+
+            if (event.type == SDL_QUIT)
+                running = false;
+        }
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderClear(renderer);
+        for (int i = 0; i < map->length; i++) 
+        {
+            for (int j = 0; j < map->width; j++) 
+            {
+                if (map->fields[(i * map->width) + j] == 0)
+                {
+                    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+                    SDL_Rect wall = {20 * j, 20 * i, 20, 20};
+                    SDL_RenderFillRect(renderer, &wall);
+                }
+            }
+        }
+
+        SDL_RenderPresent(renderer);
+    }
+
     movePlayer(game.player, &game);
 
     addTail(game.player, &tail3);
@@ -80,6 +122,9 @@ int main(int argc, char const *argv[]) {
 
 //    moveGhostHome(game.ghost1, &game);
 //    moveGhost(game.ghost1, &game);
+
+    SDL_DestroyWindow(window);
+    SDL_Quit;
 
     return 0;
 }
