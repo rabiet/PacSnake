@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
             if (event.type == SDL_QUIT)
                 running = false;
         }
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
         SDL_RenderClear(renderer);
         for (int i = 0; i < map->length; i++) 
         {
@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
             {
                 if (map->fields[(i * map->width) + j] == 0)
                 {
-                    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+                    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
                     SDL_Rect wall = {20 * j, 20 * i, 20, 20};
                     SDL_RenderFillRect(renderer, &wall);
                 }
