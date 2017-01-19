@@ -9,5 +9,6 @@ void takePowerup(struct PowerUp *powerUp){
         case FASTER: break;
         case GHOSTS_TO_CENTER: break;
         case TURNAROUND: break;
+        case EAT_WALL: break;
     }
 }

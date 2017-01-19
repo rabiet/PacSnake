@@ -103,3 +103,17 @@ void unloadMap(struct Map *map) {
 int isWall(struct Map *map, struct Position pos){
     return map->fields[map->width * pos.x + pos.y] == WALL;
 };
+
+int isOutOfMap(struct Map *map, struct Position pos){
+    if(map->width < pos.y){
+        return 1;
+    }else if(map->length < pos.x){
+        return 2;
+    }else if(pos.y < 0){
+        return 3;
+    }else if(pos.x < 0){
+        return 4;
+    }
+
+    return 0;
+}

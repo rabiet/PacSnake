@@ -48,6 +48,21 @@ void movePlayer(struct Player *player, struct GameState *game){
             break;
     }
 
+    switch (isOutOfMap(game->map, player->head)) {
+        case 1:
+            player->head.y = 0;
+            break;
+        case 2:
+            player->head.x = 0;
+            break;
+        case 3:
+            player->head.y = game->map->width;
+            break;
+        case 4:
+            player->head.x = game->map->length;
+            break;
+    }
+
     if(isWall(game->map, player->head) || isTailPos(game->player->tail, player->head)){
         //TODO: indicate the end of the game
         printf("%s\n", "This would kill the player!");

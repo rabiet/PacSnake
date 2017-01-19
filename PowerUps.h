@@ -8,7 +8,8 @@ enum PowerUpType {
     SLOWER,
     FASTER,
     GHOSTS_TO_CENTER,
-    TURNAROUND
+    TURNAROUND,
+    EAT_WALL
 };
 
 struct PowerUp {

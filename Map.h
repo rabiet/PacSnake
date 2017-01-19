@@ -23,4 +23,6 @@ void unloadMap(struct Map *map);
 
 int isWall(struct Map *map, struct Position pos);
 
+int isOutOfMap(struct Map *map, struct Position pos);
+
 #endif
