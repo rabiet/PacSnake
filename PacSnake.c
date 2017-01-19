@@ -11,13 +11,6 @@
 #include "Map.h"
 #include <SDL2/SDL.h>
 
-int gameTick(){
-
-}
-
-void printMapToSDL(struct Map *map) {
-
-}
 
 int main(int argc, char **argv) {
     srand(time(NULL));
@@ -101,10 +94,14 @@ int main(int argc, char **argv) {
 
             if (event.type == SDL_QUIT)
                 running = false;
-            if (event.key.keysym.sym == SDLK_w) turnPlayer(&player, UP);
-            if (event.key.keysym.sym == SDLK_s) turnPlayer(&player, DOWN);
-            if (event.key.keysym.sym == SDLK_a) turnPlayer(&player, LEFT);
-            if (event.key.keysym.sym == SDLK_d) turnPlayer(&player, RIGHT);
+            switch (event.key.keysym.sym)
+            {
+                case (SDLK_w): turnPlayer(&player, UP); break;
+                case (SDLK_s): turnPlayer(&player, DOWN); break;
+                case (SDLK_a): turnPlayer(&player, LEFT); break;
+                case (SDLK_d): turnPlayer(&player, RIGHT); break;
+                case (SDLK_ESCAPE): running = false;
+            }
         }
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
         SDL_RenderClear(renderer);
@@ -121,7 +118,7 @@ int main(int argc, char **argv) {
             }
         }
 
-        if (i == 30)
+        if (i == 15)
         {
             i = 0;
             movePlayer(game.player, &game);
