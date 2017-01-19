@@ -1,13 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <time.h>
+
 #include "PacSnake.h"
 #include "Ghosts.h"
 #include "PowerUps.h"
 #include "Player.h"
 #include "Position.h"
 #include "Map.h"
-#include <stdbool.h>
-
 #include <SDL2/SDL.h>
 
 int gameTick(){
@@ -15,10 +16,12 @@ int gameTick(){
 }
 
 void printMapToSDL(struct Map *map) {
-    
+
 }
 
 int main(int argc, char **argv) {
+    srand(time(NULL));
+
     struct Ghost g = {
         pos: {
             x: 9,
@@ -78,6 +81,9 @@ int main(int argc, char **argv) {
         player: &player
     };
 
+    struct PowerUp *powerUp = spawnPowerup(FASTER, 20, &game);
+    printf("%d, %d\n", powerUp->pos.x, powerUp->pos.y);
+
     const int width = 20 * map->width;
     const int height = 20 * map->length;
 
@@ -102,9 +108,9 @@ int main(int argc, char **argv) {
         }
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
         SDL_RenderClear(renderer);
-        for (int i = 0; i < map->length; i++) 
+        for (int i = 0; i < map->length; i++)
         {
-            for (int j = 0; j < map->width; j++) 
+            for (int j = 0; j < map->width; j++)
             {
                 if (map->fields[(i * map->width) + j] == 0)
                 {

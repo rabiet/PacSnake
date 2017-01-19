@@ -2,6 +2,7 @@
 #define _powerups_h
 
 #include "Position.h"
+#include "PacSnake.h"
 
 enum PowerUpType {
     EAT_GHOSTS,
@@ -20,5 +21,6 @@ struct PowerUp {
 };
 
 void takePowerup(struct PowerUp *powerUp);
+struct PowerUp *spawnPowerup(enum PowerUpType type, int time, struct GameState *state);
 
 #endif
