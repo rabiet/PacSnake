@@ -85,8 +85,11 @@ int main(int argc, char **argv) {
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     bool running = true;
+    bool pause = true;
+    int timeout = 0;
     int i = 0;
     SDL_Event event;
+    printf("\n\n\n\t\t\t\tPress Enter to start the game!\n\n\n");
     while (running)
     {
         while (SDL_PollEvent(&event))
@@ -96,11 +99,16 @@ int main(int argc, char **argv) {
                 running = false;
             switch (event.key.keysym.sym)
             {
+                case (SDLK_UP):
                 case (SDLK_w): turnPlayer(&player, UP); break;
+                case (SDLK_DOWN):
                 case (SDLK_s): turnPlayer(&player, DOWN); break;
+                case (SDLK_LEFT):
                 case (SDLK_a): turnPlayer(&player, LEFT); break;
+                case (SDLK_RIGHT):
                 case (SDLK_d): turnPlayer(&player, RIGHT); break;
-                case (SDLK_ESCAPE): running = false;
+                case (SDLK_ESCAPE): running = false; break;
+                case (SDLK_RETURN): if (timeout == 0) { pause = (pause) ? false : true; timeout = 60; printf("Game (un/)paused!"); } break;
             }
         }
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
@@ -118,38 +126,33 @@ int main(int argc, char **argv) {
             }
         }
 
-        if (i == 15)
+        if (timeout != 0) timeout--;
+
+        if (!pause)
         {
-            i = 0;
-            movePlayer(game.player, &game);
+            if (i == 15)
+            {
+                i = 0;
+                movePlayer(game.player, &game);
+            }
+            i++;
         }
 
         SDL_SetRenderDrawColor(renderer, 255, 110, 110, 255);
-        SDL_Rect snek = { game.player->head.y * 20, game.player->head.x * 20, 20, 20};
+        SDL_Rect snek = {game.player->head.y * 20, game.player->head.x * 20, 20, 20};
         SDL_RenderFillRect(renderer, &snek);
 
         struct Tail *tail = game.player->tail;
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         while(tail)
         {
-            SDL_Rect schwanz = { tail->pos.y * 20, tail->pos.x*20, 20, 20};
+            SDL_Rect schwanz = {tail->pos.y * 20, tail->pos.x*20, 20, 20};
             SDL_RenderFillRect(renderer, &schwanz);
             tail = tail->tail;
         }
 
         SDL_RenderPresent(renderer);
-        i++;
     }
-
-    movePlayer(game.player, &game);
-
-    //addTail(game.player, &tail3);
-    movePlayer(game.player, &game);
-
-    printPlayerPos(game.player);
-
-//    moveGhostHome(game.ghost1, &game);
-//    moveGhost(game.ghost1, &game);
 
     SDL_DestroyWindow(window);
     SDL_Quit;
