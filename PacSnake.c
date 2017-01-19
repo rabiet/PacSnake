@@ -21,8 +21,8 @@ void printMapToSDL(struct Map *map) {
 int main(int argc, char **argv) {
     struct Ghost g = {
         pos: {
-            x: 1,
-            y: 3
+            x: 9,
+            y: 9
         },
         direction: UP,
         type: CLYDE,
@@ -38,37 +38,37 @@ int main(int argc, char **argv) {
     }
     printMapToConsole(map);
 
-    struct Tail tail1 = {
-        tail: NULL,
-        pos: {
-            x: 1,
-            y: 2
-        }
-    };
-
-    struct Tail tail2 = {
-        tail: &tail1,
-        pos: {
-            x: 2,
-            y: 2
-        }
-    };
-
     struct Tail tail3 = {
         tail: NULL,
         pos: {
             x: 3,
-            y: 7
+            y: 1
+        }
+    };
+
+    struct Tail tail2 = {
+        tail: &tail3,
+        pos: {
+            x: 2,
+            y: 1
+        }
+    };
+
+    struct Tail tail1 = {
+        tail: &tail2,
+        pos: {
+            x: 1,
+            y: 1
         }
     };
 
     struct Player player = {
-        length: 1,
+        length: 4,
         head: {
-            x: 2,
-            y: 3
+            x: 1,
+            y: 2
         },
-        tail: &tail2,
+        tail: &tail1,
         direction: RIGHT
     };
 
@@ -86,6 +86,7 @@ int main(int argc, char **argv) {
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     bool running = true;
+    int i = 0;
     SDL_Event event;
     while (running)
     {
@@ -94,6 +95,10 @@ int main(int argc, char **argv) {
 
             if (event.type == SDL_QUIT)
                 running = false;
+            if (event.key.keysym.sym == SDLK_w) turnPlayer(&player, UP);
+            if (event.key.keysym.sym == SDLK_s) turnPlayer(&player, DOWN);
+            if (event.key.keysym.sym == SDLK_a) turnPlayer(&player, LEFT);
+            if (event.key.keysym.sym == SDLK_d) turnPlayer(&player, RIGHT);
         }
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
         SDL_RenderClear(renderer);
@@ -110,12 +115,32 @@ int main(int argc, char **argv) {
             }
         }
 
+        if (i == 30)
+        {
+            i = 0;
+            movePlayer(game.player, &game);
+        }
+
+        SDL_SetRenderDrawColor(renderer, 255, 110, 110, 255);
+        SDL_Rect snek = { game.player->head.y * 20, game.player->head.x * 20, 20, 20};
+        SDL_RenderFillRect(renderer, &snek);
+
+        struct Tail *tail = game.player->tail;
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        while(tail)
+        {
+            SDL_Rect schwanz = { tail->pos.y * 20, tail->pos.x*20, 20, 20};
+            SDL_RenderFillRect(renderer, &schwanz);
+            tail = tail->tail;
+        }
+
         SDL_RenderPresent(renderer);
+        i++;
     }
 
     movePlayer(game.player, &game);
 
-    addTail(game.player, &tail3);
+    //addTail(game.player, &tail3);
     movePlayer(game.player, &game);
 
     printPlayerPos(game.player);

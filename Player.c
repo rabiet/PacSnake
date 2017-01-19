@@ -35,16 +35,16 @@ void movePlayer(struct Player *player, struct GameState *game){
 
     switch (player->direction) {
         case UP:
-            player->head.x++;
-            break;
-        case DOWN:
             player->head.x--;
             break;
+        case DOWN:
+            player->head.x++;
+            break;
         case LEFT:
-            player->head.y++;
+            player->head.y--;
             break;
         case RIGHT:
-            player->head.y--;
+            player->head.y++;
             break;
     }
 
