@@ -109,9 +109,9 @@ int isOutOfMap(struct Map *map, struct Position pos){
         return 1;
     }else if(map->length <= pos.x){
         return 2;
-    }else if(pos.y <= 0){
+    }else if(pos.y < 0){
         return 3;
-    }else if(pos.x <= 0){
+    }else if(pos.x < 0){
         return 4;
     }
 

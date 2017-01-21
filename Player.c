@@ -31,7 +31,6 @@ int isPlayerPos(struct Player *player, struct Position pos){
 
 void movePlayer(struct Player *player, struct GameState *game){
     struct Position oldPos = player->head;
-    printPlayerPos(player);
 
     switch (player->direction) {
         case UP:
@@ -56,10 +55,10 @@ void movePlayer(struct Player *player, struct GameState *game){
             player->head.x = 0;
             break;
         case 3:
-            player->head.y = game->map->width;
+            player->head.y = game->map->width - 1;
             break;
         case 4:
-            player->head.x = game->map->length;
+            player->head.x = game->map->length - 1;
             break;
     }
 
