@@ -75,9 +75,9 @@ int main(int argc, char **argv) {
         powerUp: NULL
     };
 
-    spawnPowerup(FASTER, 20, &game);
-    spawnPowerup(SLOWER, 20, &game);
-    spawnPowerup(EAT_WALL, 20, &game);
+    spawnPowerup(GROW, 20, &game);
+    spawnPowerup(GROW, 20, &game);
+    spawnPowerup(GROW, 20, &game);
 
     const int width = 20 * map->width;
     const int height = 20 * map->length;

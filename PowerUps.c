@@ -48,8 +48,8 @@ void spawnPowerup(enum PowerUpType type, int t, struct GameState *state){
     powerUp->next = NULL;
 
     struct Position pos = {
-        x: rand() % state->map->width,
-        y: rand() % state->map->length
+        x: rand() % state->map->length,
+        y: rand() % state->map->width
     };
 
     while(isWall(state->map, pos) || isPlayerPos(state->player, pos) || isPowerupPos(state->powerUp, pos)){
@@ -83,10 +83,13 @@ void takePowerup(struct PowerUp *powerUp, struct GameState *state){
         case GHOSTS_TO_CENTER: break;
         case TURNAROUND: break;
         case EAT_WALL: break;
+        case GROW:
+            growTail(state->player);
+            break;
     }
 
     removePowerup(powerUp, state);
-    spawnPowerup(EAT_WALL, 20, state);
+    spawnPowerup(GROW, 20, state);
 }
 
 void takePowerupPos(struct Position pos, struct GameState *state){

@@ -92,6 +92,23 @@ void addTail(struct Player *player, struct Tail *newTail){
     prevTail->tail = newTail;
 }
 
+void growTail(struct Player *player){
+    struct Tail *lastTail = player->tail;
+
+    while(lastTail->tail) {
+        lastTail = lastTail->tail;
+    }
+
+    struct Tail *tail = malloc(sizeof(struct Tail));
+
+    tail->tail = NULL;
+    tail->pos = lastTail->pos;
+
+    lastTail->tail = tail;
+
+    player->length++;
+}
+
 void turnPlayer(struct Player *player, enum Direction direction){
     player->direction = direction;
 }

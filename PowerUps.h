@@ -2,9 +2,11 @@
 #define _powerups_h
 
 #include "Position.h"
+#include "Player.h"
 #include "PacSnake.h"
 
 enum PowerUpType {
+    GROW,
     EAT_GHOSTS,
     SLOWER,
     FASTER,
