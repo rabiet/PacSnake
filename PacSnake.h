@@ -10,6 +10,7 @@ struct GameState {
     struct Map *map;
     struct Ghost *ghost1;
     struct Player *player;
+    struct PowerUp *powerUp;
 };
 
 #endif

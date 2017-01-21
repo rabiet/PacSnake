@@ -70,7 +70,13 @@ struct Map* loadMap() {
         if (c == '\n') {
             row++;
             col = 0;
+            if(row >= length){
+                break;
+            }
         } else {
+            if(col >= width){
+                break;
+            }
             switch (c) {
             case '#':
                 map[row * width + col] = WALL;

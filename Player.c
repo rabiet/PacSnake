@@ -62,6 +62,8 @@ void movePlayer(struct Player *player, struct GameState *game){
             break;
     }
 
+    takePowerupPos(player->head, game);
+
     if(isWall(game->map, player->head) || isTailPos(game->player->tail, player->head)){
         //TODO: indicate the end of the game
         printf("%s\n", "This would kill the player!");

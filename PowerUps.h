@@ -18,9 +18,12 @@ struct PowerUp {
   int time;
   struct Position pos;
   enum PowerUpType type;
+  struct PowerUp *next;
 };
 
-void takePowerup(struct PowerUp *powerUp);
-struct PowerUp *spawnPowerup(enum PowerUpType type, int time, struct GameState *state);
+int isPowerupPos(struct PowerUp *powerUp, struct Position pos);
+void takePowerupPos(struct Position pos, struct GameState *state);
+void takePowerup(struct PowerUp *powerUp, struct GameState *state);
+void spawnPowerup(enum PowerUpType type, int time, struct GameState *state);
 
 #endif

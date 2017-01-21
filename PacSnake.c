@@ -71,11 +71,13 @@ int main(int argc, char **argv) {
     struct GameState game = {
         map: map,
         ghost1: &g,
-        player: &player
+        player: &player,
+        powerUp: NULL
     };
 
-    struct PowerUp *powerUp = spawnPowerup(FASTER, 20, &game);
-    printf("%d, %d\n", powerUp->pos.x, powerUp->pos.y);
+    spawnPowerup(FASTER, 20, &game);
+    spawnPowerup(SLOWER, 20, &game);
+    spawnPowerup(EAT_WALL, 20, &game);
 
     const int width = 20 * map->width;
     const int height = 20 * map->length;
@@ -138,6 +140,15 @@ int main(int argc, char **argv) {
             i++;
         }
 
+        struct PowerUp *powerUp = game.powerUp;
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        while(powerUp)
+        {
+            SDL_Rect powerUpRect = {powerUp->pos.y * 20, powerUp->pos.x*20, 20, 20};
+            SDL_RenderFillRect(renderer, &powerUpRect);
+            powerUp = powerUp->next;
+        }
+
         SDL_SetRenderDrawColor(renderer, 255, 110, 110, 255);
         SDL_Rect snek = {game.player->head.y * 20, game.player->head.x * 20, 20, 20};
         SDL_RenderFillRect(renderer, &snek);
@@ -150,6 +161,7 @@ int main(int argc, char **argv) {
             SDL_RenderFillRect(renderer, &schwanz);
             tail = tail->tail;
         }
+
 
         SDL_RenderPresent(renderer);
     }

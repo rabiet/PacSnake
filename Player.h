@@ -4,6 +4,7 @@
 #include "Player_structs.h"
 #include "Position.h"
 #include "PacSnake.h"
+#include "PowerUps.h"
 
 int isPlayerPos(struct Player *player, struct Position pos);
 
