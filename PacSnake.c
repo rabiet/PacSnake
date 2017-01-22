@@ -15,17 +15,29 @@
 int main(int argc, char **argv) {
     srand(time(NULL));
 
+    struct Ghost g2 = {
+        pos: {
+            x: 14,
+            y: 12
+        },
+        direction: DOWN,
+        homePos: {
+            x: 14,
+            y: 12
+        },
+        next: NULL
+    };
     struct Ghost g = {
         pos: {
-            x: 9,
-            y: 9
+            x: 14,
+            y: 15
         },
         direction: UP,
-        type: CLYDE,
         homePos: {
-            x: 5,
-            y: 5
-        }
+            x: 14,
+            y: 15
+        },
+        next: &g2
     };
 
     struct Map *map = loadMap();
@@ -70,13 +82,13 @@ int main(int argc, char **argv) {
 
     struct GameState game = {
         map: map,
-        ghost1: &g,
+        ghost: &g,
         player: &player,
         powerUp: NULL
     };
 
     spawnPowerup(GROW, 20, &game);
-    spawnPowerup(GROW, 20, &game);
+    spawnPowerup(GHOSTS_TO_CENTER, 20, &game);
     spawnPowerup(GROW, 20, &game);
 
     const int width = 20 * map->width;
@@ -136,6 +148,7 @@ int main(int argc, char **argv) {
             {
                 i = 0;
                 movePlayer(game.player, &game);
+                moveGhosts(game.ghost, &game);
             }
             i++;
         }
@@ -147,6 +160,15 @@ int main(int argc, char **argv) {
             SDL_Rect powerUpRect = {powerUp->pos.y * 20, powerUp->pos.x*20, 20, 20};
             SDL_RenderFillRect(renderer, &powerUpRect);
             powerUp = powerUp->next;
+        }
+
+        struct Ghost *ghost = game.ghost;
+        SDL_SetRenderDrawColor(renderer, 0, 255, 110, 255);
+        while(ghost)
+        {
+            SDL_Rect ghostUpRect = {ghost->pos.y * 20, ghost->pos.x*20, 20, 20};
+            SDL_RenderFillRect(renderer, &ghostUpRect);
+            ghost = ghost->next;
         }
 
         SDL_SetRenderDrawColor(renderer, 255, 110, 110, 255);

@@ -107,6 +107,10 @@ void unloadMap(struct Map *map) {
 }
 
 int isWall(struct Map *map, struct Position pos){
+    if(isOutOfMap(map, pos)){
+        return 0;
+    }
+
     return map->fields[map->width * pos.x + pos.y] == WALL;
 };
 

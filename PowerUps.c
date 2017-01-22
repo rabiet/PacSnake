@@ -80,7 +80,9 @@ void takePowerup(struct PowerUp *powerUp, struct GameState *state){
         case EAT_GHOSTS: break;
         case SLOWER: break;
         case FASTER: break;
-        case GHOSTS_TO_CENTER: break;
+        case GHOSTS_TO_CENTER:
+            moveGhostsHome(state->ghost, state);
+            break;
         case TURNAROUND: break;
         case EAT_WALL: break;
         case GROW:

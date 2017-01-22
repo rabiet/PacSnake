@@ -8,7 +8,7 @@
 
 struct GameState {
     struct Map *map;
-    struct Ghost *ghost1;
+    struct Ghost *ghost;
     struct Player *player;
     struct PowerUp *powerUp;
 };

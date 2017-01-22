@@ -3,6 +3,7 @@
 
 #include "Position.h"
 #include "Player.h"
+#include "Ghosts.h"
 #include "PacSnake.h"
 
 enum PowerUpType {
