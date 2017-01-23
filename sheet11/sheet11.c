@@ -35,7 +35,7 @@ int main(int argc, char const *argv[]) {
 
 
     // read the equations from the file
-    int *equations = malloc(sizeof(int) * n *k);
+    long *equations = malloc(sizeof(long) * n *k);
     for(int i = 0; i < n*k; i++){
         fscanf(file, "%d", equations+i);
     }
@@ -82,10 +82,12 @@ int main(int argc, char const *argv[]) {
 
         // solve U * x = y for x
         for(int j = n-1; j >= 0; j--){
-            for(int l = j+1; l < n; l++){
-                *(equations+(n*i)+j) -= *(matrix+(n*j)+l) * *(equations+(n*i)+l);
+            if(*(matrix+(j*n)+j)){
+                for(int l = j+1; l < n; l++){
+                    *(equations+(n*i)+j) -= *(matrix+(n*j)+l) * *(equations+(n*i)+l);
+                }
+                *(equations+(n*i)+j) /= *(matrix+(j*n)+j);
             }
-            *(equations+(n*i)+j) /= *(matrix+(j*n)+j);
         }
 
         // print the solution x to the console
