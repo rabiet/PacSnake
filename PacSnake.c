@@ -12,6 +12,16 @@
 #include <SDL2/SDL.h>
 
 
+void renderTexture(SDL_Texture *texture, SDL_Renderer *renderer, int x, int y)
+{
+    SDL_Rect helperRect;
+    helperRect.x = x;
+    helperRect.y = y;
+    helperRect.h = 20;
+    helperRect.w = 20;
+    SDL_RenderCopy(renderer, texture, NULL, &helperRect);
+}
+
 int main(int argc, char **argv) {
     srand(time(NULL));
 
@@ -98,6 +108,12 @@ int main(int argc, char **argv) {
     SDL_Window *window = SDL_CreateWindow("PacSnake", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_OPENGL);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
+    SDL_Texture *ghostTexture;
+    SDL_Surface *imageLoader = SDL_LoadBMP("ghost.bmp");;
+    ghostTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
+    SDL_FreeSurface(imageLoader);
+
+
     bool running = true;
     bool pause = true;
     int timeout = 0;
@@ -154,7 +170,7 @@ int main(int argc, char **argv) {
         }
 
         struct PowerUp *powerUp = game.powerUp;
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
         while(powerUp)
         {
             SDL_Rect powerUpRect = {powerUp->pos.y * 20, powerUp->pos.x*20, 20, 20};
@@ -163,11 +179,9 @@ int main(int argc, char **argv) {
         }
 
         struct Ghost *ghost = game.ghost;
-        SDL_SetRenderDrawColor(renderer, 0, 255, 110, 255);
         while(ghost)
         {
-            SDL_Rect ghostUpRect = {ghost->pos.y * 20, ghost->pos.x*20, 20, 20};
-            SDL_RenderFillRect(renderer, &ghostUpRect);
+            renderTexture(ghostTexture, renderer, ghost->pos.y * 20, ghost->pos.x * 20);
             ghost = ghost->next;
         }
 
@@ -184,10 +198,12 @@ int main(int argc, char **argv) {
             tail = tail->tail;
         }
 
-
         SDL_RenderPresent(renderer);
     }
-
+    //SDL_FreeSurface(screen);
+    //SDL_FreeSurface(Ghost);
+    //screen=NULL;
+    //Ghost=NULL;
     SDL_DestroyWindow(window);
     SDL_Quit;
 
