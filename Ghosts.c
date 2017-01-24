@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "Ghosts.h"
+#include "Player.h"
 
 void moveGhost(struct Ghost *ghost, struct GameState *game) {
     struct Position up = {ghost->pos.x-1, ghost->pos.y};
@@ -68,6 +69,29 @@ void moveGhost(struct Ghost *ghost, struct GameState *game) {
         case 4:
             ghost->pos.x = game->map->length - 1;
             break;
+    }
+
+
+    if(comparePositions(&game->player->head, &ghost->pos)){
+        // do nothing :)
+    }else if(game->player->tail && comparePositions(&game->player->tail->pos, &ghost->pos)){
+        removeTails(game->player->tail);
+        game->player->tail = NULL;
+    }else{
+        struct Tail *tail = game->player->tail;
+        struct Tail *oldtail = game->player->tail;
+
+        while(tail && !comparePositions(&tail->pos, &ghost->pos)) {
+            oldtail = tail;
+            tail = tail->tail;
+        }
+
+        if(tail){
+            removeTails(tail);
+            if(oldtail){
+                oldtail->tail = NULL;
+            }
+        }
     }
 }
 

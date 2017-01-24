@@ -44,21 +44,21 @@ void renderTexture(SDL_Texture *texture, int x, int y)
 
 void handleReturn()
 {
-    if (!alive) 
-    { 
-        if (selected == 0) 
-        { 
+    if (!alive)
+    {
+        if (selected == 0)
+        {
             alive = true;
             timeout = 60;
-        } 
-        else running = false; 
-    }else{ 
-        if (timeout == 0) 
-        { 
-            pause = (pause) ? false : true; 
-            timeout = 60; 
-            printf("Game (un/)paused!");   
-        } 
+        }
+        else running = false;
+    }else{
+        if (timeout == 0)
+        {
+            pause = (pause) ? false : true;
+            timeout = 60;
+            printf("Game (un/)paused!");
+        }
     }
 }
 
@@ -74,7 +74,7 @@ void renderText(const char *text, int x, int y, SDL_Color color, int center)
         case 0: rect.x = x; rect.y = y; break;                                              // Not centered, use x and y
         case 1: rect.y = height / 2 - rect.h / 2; rect.x = width / 2 - rect.w / 2; break;   // Centered in right in the middle of the screen
         case 2: rect.x = width / 2 - rect.w / 2; rect.y = y; break;                         // Centered horizontally
-    }	
+    }
     SDL_RenderCopy(renderer, textT, NULL, &rect);
 }
 
@@ -127,29 +127,20 @@ int main(int argc, char **argv) {
     }
     printMapToConsole(map);
 
-    struct Tail tail3 = {
-        tail: NULL,
-        pos: {
-            x: 3,
-            y: 1
-        }
-    };
+    struct Tail *tail3 = malloc(sizeof(struct Tail));
+    tail3->tail = NULL;
+    tail3->pos.x = 3;
+    tail3->pos.y = 1;
 
-    struct Tail tail2 = {
-        tail: &tail3,
-        pos: {
-            x: 2,
-            y: 1
-        }
-    };
+    struct Tail *tail2 = malloc(sizeof(struct Tail));
+    tail2->tail = tail3;
+    tail2->pos.x = 2;
+    tail2->pos.y = 1;
 
-    struct Tail tail1 = {
-        tail: &tail2,
-        pos: {
-            x: 1,
-            y: 1
-        }
-    };
+    struct Tail *tail1 = malloc(sizeof(struct Tail));
+    tail1->tail = tail2;
+    tail1->pos.x = 1;
+    tail1->pos.y = 1;
 
     struct Player player = {
         length: 4,
@@ -157,7 +148,7 @@ int main(int argc, char **argv) {
             x: 1,
             y: 2
         },
-        tail: &tail1,
+        tail: tail1,
         direction: RIGHT
     };
 
@@ -177,7 +168,7 @@ int main(int argc, char **argv) {
 
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
-    
+
     SDL_Window *window = SDL_CreateWindow("PacSnake", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_OPENGL);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 

@@ -62,14 +62,6 @@ void movePlayer(struct Player *player, struct GameState *game){
             break;
     }
 
-    takePowerupPos(player->head, game);
-
-    if(isWall(game->map, player->head) || isTailPos(game->player->tail, player->head)){
-        //TODO: indicate the end of the game
-        alive = false;
-        printf("%s\n", "This would kill the player!");
-    }
-
     struct Tail *tail = player->tail;
     struct Position tempPos;
 
@@ -79,6 +71,13 @@ void movePlayer(struct Player *player, struct GameState *game){
         oldPos = tempPos;
         tail = tail->tail;
     }
+
+    if(isWall(game->map, player->head) || isTailPos(game->player->tail, player->head)){
+        alive = false;
+        printf("%s\n", "This would kill the player!");
+    }
+
+    takePowerupPos(player->head, game);
 }
 
 void addTail(struct Player *player, struct Tail *newTail){
@@ -94,22 +93,34 @@ void addTail(struct Player *player, struct Tail *newTail){
 }
 
 void growTail(struct Player *player){
-    struct Tail *lastTail = player->tail;
-
-    while(lastTail->tail) {
-        lastTail = lastTail->tail;
-    }
-
     struct Tail *tail = malloc(sizeof(struct Tail));
-
     tail->tail = NULL;
-    tail->pos = lastTail->pos;
 
-    lastTail->tail = tail;
+    if(!player->tail) {
+        tail->pos = player->head;
+        player->tail = tail;
+    } else {
+        struct Tail *lastTail = player->tail;
+
+        while(lastTail->tail) {
+            lastTail = lastTail->tail;
+        }
+
+        tail->pos = lastTail->pos;
+        lastTail->tail = tail;
+    }
 
     player->length++;
 }
 
 void turnPlayer(struct Player *player, enum Direction direction){
     player->direction = direction;
+}
+
+void removeTails(struct Tail *tail){
+    while(tail){
+        struct Tail *t = tail;
+        tail = t->tail;
+        free(t);
+    }
 }
