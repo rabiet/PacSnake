@@ -12,8 +12,10 @@ struct GameState {
     struct Ghost *ghost;
     struct Player *player;
     struct PowerUp *powerUp;
+    bool alive;
+    bool running;
+    bool pause;
+    int pauseTimeout;
 };
-
-bool alive;
 
 #endif

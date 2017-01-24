@@ -13,12 +13,7 @@
 #include <SDL2/SDL_ttf.h>
 
 
-bool alive = false;
-bool running = true;
-bool pause = false;
-
 int selected = 0;
-int timeout = 0;
 
 SDL_Renderer *renderer;
 
@@ -30,7 +25,102 @@ SDL_Color red   = {255, 0, 0, 255};
 
 TTF_Font *font;
 
+struct GameState *resetGame(struct GameState *state){
+    // free old ghosts
+    if(state && state->ghost){
+        struct Ghost *g = state->ghost;
+        while(g){
+            struct Ghost *t = g;
+            g = t->next;
+            free(t);
+        }
+        state->ghost = NULL;
+    }
 
+    // create the ghosts
+    struct Ghost *ghost = malloc(sizeof(struct Ghost));
+    struct Ghost *ghost2 = malloc(sizeof(struct Ghost));
+
+    ghost->pos.x = 14;
+    ghost->pos.y = 15;
+    ghost->direction = UP;
+    ghost->homePos.x = 14;
+    ghost->homePos.y = 15;
+    ghost->next = ghost2;
+
+    ghost2->pos.x = 14;
+    ghost2->pos.y = 12;
+    ghost2->direction = DOWN;
+    ghost2->homePos.x = 14;
+    ghost2->homePos.y = 12;
+    ghost2->next = NULL;
+
+    // free old map
+    if(state && state->map){
+        free(state->map);
+        state->map = NULL;
+    }
+
+    struct Map *map = loadMap();
+    if(map == NULL){
+        printf("Coudn't load map...\n");
+        return NULL;
+    }
+
+    // free old player
+    if(state && state->player){
+        if(state->player->tail){
+            removeTails(state->player->tail);
+        }
+        free(state->player);
+        state->player = NULL;
+    }
+
+    // create player
+    struct Player *player = malloc(sizeof(struct Player));
+    struct Tail *tail1 = malloc(sizeof(struct Tail));
+    struct Tail *tail2 = malloc(sizeof(struct Tail));
+    struct Tail *tail3 = malloc(sizeof(struct Tail));
+
+    player->length = 4;
+    player->head.x = 1;
+    player->head.y = 2;
+    player->direction = RIGHT;
+    player->tail = tail1;
+
+    tail1->tail = tail2;
+    tail1->pos.x = 1;
+    tail1->pos.y = 1;
+
+    tail2->tail = tail3;
+    tail2->pos.x = 2;
+    tail2->pos.y = 1;
+
+    tail3->tail = NULL;
+    tail3->pos.x = 3;
+    tail3->pos.y = 1;
+
+    if(!state){
+        state = malloc(sizeof(struct GameState));
+    }
+
+    // create gamestate
+    state->map = map;
+    state->ghost = ghost;
+    state->player = player;
+    state->powerUp = NULL;
+    state->alive = false;
+    state->running = true;
+    state->pause = false;
+    state->pauseTimeout = 60;
+
+    // create init powerups
+    spawnPowerup(GROW, 0, state);
+    spawnPowerup(GHOSTS_TO_CENTER, 0, state);
+    spawnPowerup(GROW, 0, state);
+
+    return state;
+}
 
 void renderTexture(SDL_Texture *texture, int x, int y)
 {
@@ -42,22 +132,22 @@ void renderTexture(SDL_Texture *texture, int x, int y)
     SDL_RenderCopy(renderer, texture, NULL, &helperRect);
 }
 
-void handleReturn()
+void handleReturn(struct GameState *state)
 {
-    if (!alive)
+    if (!state->alive)
     {
         if (selected == 0)
         {
-            alive = true;
-            timeout = 60;
+            state = resetGame(state);
+            state->alive = true;
         }
-        else running = false;
+        else state->running = false;
     }else{
-        if (timeout == 0)
+        if (state->pauseTimeout == 0)
         {
-            pause = (pause) ? false : true;
-            timeout = 60;
-            printf("Game (un/)paused!");
+            state->pause = (state->pause) ? false : true;
+            state->pauseTimeout = 60;
+            printf("Game (un/)paused!\n");
         }
     }
 }
@@ -96,75 +186,14 @@ void renderMenu()
 int main(int argc, char **argv) {
     srand(time(NULL));
 
-    struct Ghost g2 = {
-        pos: {
-            x: 14,
-            y: 12
-        },
-        direction: DOWN,
-        homePos: {
-            x: 14,
-            y: 12
-        },
-        next: NULL
-    };
-    struct Ghost g = {
-        pos: {
-            x: 14,
-            y: 15
-        },
-        direction: UP,
-        homePos: {
-            x: 14,
-            y: 15
-        },
-        next: &g2
-    };
+    struct GameState *game = resetGame(NULL);
 
-    struct Map *map = loadMap();
-    if(map == NULL){
+    if(!game){
         return -1;
     }
-    printMapToConsole(map);
 
-    struct Tail *tail3 = malloc(sizeof(struct Tail));
-    tail3->tail = NULL;
-    tail3->pos.x = 3;
-    tail3->pos.y = 1;
-
-    struct Tail *tail2 = malloc(sizeof(struct Tail));
-    tail2->tail = tail3;
-    tail2->pos.x = 2;
-    tail2->pos.y = 1;
-
-    struct Tail *tail1 = malloc(sizeof(struct Tail));
-    tail1->tail = tail2;
-    tail1->pos.x = 1;
-    tail1->pos.y = 1;
-
-    struct Player player = {
-        length: 4,
-        head: {
-            x: 1,
-            y: 2
-        },
-        tail: tail1,
-        direction: RIGHT
-    };
-
-    struct GameState game = {
-        map: map,
-        ghost: &g,
-        player: &player,
-        powerUp: NULL
-    };
-
-    spawnPowerup(GROW, 20, &game);
-    spawnPowerup(GHOSTS_TO_CENTER, 20, &game);
-    spawnPowerup(GROW, 20, &game);
-
-    width = 20 * map->width;
-    height = 20 * map->length;
+    width = 20 * game->map->width;
+    height = 20 * game->map->length;
 
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
@@ -182,34 +211,34 @@ int main(int argc, char **argv) {
     int i = 0;
     SDL_Event event;
     printf("\n\n\n\t\t\t\tPress Enter to start the game!\n\n\n");
-    while (running)
+    while (game->running)
     {
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_QUIT)
-                running = false;
+                game->running = false;
             switch (event.key.keysym.sym)
             {
                 case (SDLK_UP):
-                case (SDLK_w): if (alive) turnPlayer(&player, UP); else { if (selected != 0) selected--;} break;
+                case (SDLK_w): if (game->alive) turnPlayer(game->player, UP); else { if (selected != 0) selected--;} break;
                 case (SDLK_DOWN):
-                case (SDLK_s): if (alive) turnPlayer(&player, DOWN); else { if (selected != 1) selected++;} break;
+                case (SDLK_s): if (game->alive) turnPlayer(game->player, DOWN); else { if (selected != 1) selected++;} break;
                 case (SDLK_LEFT):
-                case (SDLK_a): turnPlayer(&player, LEFT); break;
+                case (SDLK_a): turnPlayer(game->player, LEFT); break;
                 case (SDLK_RIGHT):
-                case (SDLK_d): turnPlayer(&player, RIGHT); break;
-                case (SDLK_ESCAPE): running = false; break;
-                case (SDLK_RETURN): handleReturn(); break;
+                case (SDLK_d): turnPlayer(game->player, RIGHT); break;
+                case (SDLK_ESCAPE): game->running = false; break;
+                case (SDLK_RETURN): handleReturn(game); break;
             }
         }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
         SDL_RenderClear(renderer);
-        for (int i = 0; i < map->length; i++)
+        for (int i = 0; i < game->map->length; i++)
         {
-            for (int j = 0; j < map->width; j++)
+            for (int j = 0; j < game->map->width; j++)
             {
-                if (map->fields[(i * map->width) + j] == 0)
+                if (game->map->fields[(i * game->map->width) + j] == 0)
                 {
                     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
                     SDL_Rect wall = {20 * j, 20 * i, 20, 20};
@@ -218,9 +247,9 @@ int main(int argc, char **argv) {
             }
         }
 
-        if (timeout != 0) timeout--;
+        if (game->pauseTimeout != 0) game->pauseTimeout--;
 
-        struct PowerUp *powerUp = game.powerUp;
+        struct PowerUp *powerUp = game->powerUp;
         SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
         while(powerUp)
         {
@@ -229,7 +258,7 @@ int main(int argc, char **argv) {
             powerUp = powerUp->next;
         }
 
-        struct Ghost *ghost = game.ghost;
+        struct Ghost *ghost = game->ghost;
         while(ghost)
         {
             renderTexture(ghostTexture, ghost->pos.y * 20, ghost->pos.x * 20);
@@ -237,10 +266,10 @@ int main(int argc, char **argv) {
         }
 
         SDL_SetRenderDrawColor(renderer, 255, 110, 110, 255);
-        SDL_Rect snek = {game.player->head.y * 20, game.player->head.x * 20, 20, 20};
+        SDL_Rect snek = {game->player->head.y * 20, game->player->head.x * 20, 20, 20};
         SDL_RenderFillRect(renderer, &snek);
 
-        struct Tail *tail = game.player->tail;
+        struct Tail *tail = game->player->tail;
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         while(tail)
         {
@@ -249,18 +278,18 @@ int main(int argc, char **argv) {
             tail = tail->tail;
         }
 
-        if (!alive)
+        if (!game->alive)
         {
             renderMenu();
-        }else if (pause){
+        }else if (game->pause){
             darkenBackground();
             renderText("GAME PAUSED", 0, 0, white, 1);
         }else{
             if (i == 15)
             {
                 i = 0;
-                movePlayer(game.player, &game);
-                moveGhosts(game.ghost, &game);
+                movePlayer(game->player, game);
+                moveGhosts(game->ghost, game);
             }
             i++;
         }

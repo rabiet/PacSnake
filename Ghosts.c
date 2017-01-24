@@ -73,10 +73,12 @@ void moveGhost(struct Ghost *ghost, struct GameState *game) {
 
 
     if(comparePositions(&game->player->head, &ghost->pos)){
-        // do nothing :)
+        if(game->player->tail){
+            removeTails(game->player->tail);
+            game->player->tail = NULL;
+        }
     }else if(game->player->tail && comparePositions(&game->player->tail->pos, &ghost->pos)){
         removeTails(game->player->tail);
-        game->player->tail = NULL;
     }else{
         struct Tail *tail = game->player->tail;
         struct Tail *oldtail = game->player->tail;

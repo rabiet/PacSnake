@@ -73,8 +73,7 @@ void movePlayer(struct Player *player, struct GameState *game){
     }
 
     if(isWall(game->map, player->head) || isTailPos(game->player->tail, player->head)){
-        alive = false;
-        printf("%s\n", "This would kill the player!");
+        game->alive = false;
     }
 
     takePowerupPos(player->head, game);
