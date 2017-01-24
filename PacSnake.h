@@ -5,6 +5,7 @@
 #include "Map.h"
 #include "Ghosts_structs.h"
 #include "Player_structs.h"
+#include <stdbool.h>
 
 struct GameState {
     struct Map *map;
@@ -12,5 +13,7 @@ struct GameState {
     struct Player *player;
     struct PowerUp *powerUp;
 };
+
+bool alive;
 
 #endif

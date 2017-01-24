@@ -10,9 +10,29 @@
 #include "Position.h"
 #include "Map.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 
-void renderTexture(SDL_Texture *texture, SDL_Renderer *renderer, int x, int y)
+bool alive = false;
+bool running = true;
+bool pause = false;
+
+int selected = 0;
+int timeout = 0;
+
+SDL_Renderer *renderer;
+
+int width;
+int height;
+
+SDL_Color white = {255, 255, 255, 255};
+SDL_Color red   = {255, 0, 0, 255};
+
+TTF_Font *font;
+
+
+
+void renderTexture(SDL_Texture *texture, int x, int y)
 {
     SDL_Rect helperRect;
     helperRect.x = x;
@@ -20,6 +40,57 @@ void renderTexture(SDL_Texture *texture, SDL_Renderer *renderer, int x, int y)
     helperRect.h = 20;
     helperRect.w = 20;
     SDL_RenderCopy(renderer, texture, NULL, &helperRect);
+}
+
+void handleReturn()
+{
+    if (!alive) 
+    { 
+        if (selected == 0) 
+        { 
+            alive = true;
+            timeout = 60;
+        } 
+        else running = false; 
+    }else{ 
+        if (timeout == 0) 
+        { 
+            pause = (pause) ? false : true; 
+            timeout = 60; 
+            printf("Game (un/)paused!");   
+        } 
+    }
+}
+
+void renderText(const char *text, int x, int y, SDL_Color color, int center)
+{
+    SDL_Surface *pauseText = TTF_RenderText_Solid(font, text, color);
+    SDL_Texture* textT = SDL_CreateTextureFromSurface(renderer, pauseText);
+    SDL_FreeSurface(pauseText);
+    SDL_Rect rect;
+    SDL_QueryTexture( textT, NULL, NULL, &rect.w, &rect.h );
+    switch (center)
+    {
+        case 0: rect.x = x; rect.y = y; break;                                              // Not centered, use x and y
+        case 1: rect.y = height / 2 - rect.h / 2; rect.x = width / 2 - rect.w / 2; break;   // Centered in right in the middle of the screen
+        case 2: rect.x = width / 2 - rect.w / 2; rect.y = y; break;                         // Centered horizontally
+    }	
+    SDL_RenderCopy(renderer, textT, NULL, &rect);
+}
+
+void darkenBackground()
+{
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 225);
+    SDL_Rect background = {0, 0, width, height};
+    SDL_RenderFillRect(renderer, &background);
+}
+
+void renderMenu()
+{
+    darkenBackground();
+    renderText("New Game", -1, height / 2 - 50, (selected == 1) ? white : red, 2);
+    renderText("Exit", -1, height / 2 + 50, (selected == 0) ? white : red, 2);
 }
 
 int main(int argc, char **argv) {
@@ -101,22 +172,22 @@ int main(int argc, char **argv) {
     spawnPowerup(GHOSTS_TO_CENTER, 20, &game);
     spawnPowerup(GROW, 20, &game);
 
-    const int width = 20 * map->width;
-    const int height = 20 * map->length;
+    width = 20 * map->width;
+    height = 20 * map->length;
 
     SDL_Init(SDL_INIT_VIDEO);
+    TTF_Init();
+    
     SDL_Window *window = SDL_CreateWindow("PacSnake", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_OPENGL);
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+    font = TTF_OpenFont("consola.ttf", 50);
 
     SDL_Texture *ghostTexture;
     SDL_Surface *imageLoader = SDL_LoadBMP("ghost.bmp");;
     ghostTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
     SDL_FreeSurface(imageLoader);
 
-
-    bool running = true;
-    bool pause = true;
-    int timeout = 0;
     int i = 0;
     SDL_Event event;
     printf("\n\n\n\t\t\t\tPress Enter to start the game!\n\n\n");
@@ -124,23 +195,23 @@ int main(int argc, char **argv) {
     {
         while (SDL_PollEvent(&event))
         {
-
             if (event.type == SDL_QUIT)
                 running = false;
             switch (event.key.keysym.sym)
             {
                 case (SDLK_UP):
-                case (SDLK_w): turnPlayer(&player, UP); break;
+                case (SDLK_w): if (alive) turnPlayer(&player, UP); else { if (selected != 0) selected--;} break;
                 case (SDLK_DOWN):
-                case (SDLK_s): turnPlayer(&player, DOWN); break;
+                case (SDLK_s): if (alive) turnPlayer(&player, DOWN); else { if (selected != 1) selected++;} break;
                 case (SDLK_LEFT):
                 case (SDLK_a): turnPlayer(&player, LEFT); break;
                 case (SDLK_RIGHT):
                 case (SDLK_d): turnPlayer(&player, RIGHT); break;
                 case (SDLK_ESCAPE): running = false; break;
-                case (SDLK_RETURN): if (timeout == 0) { pause = (pause) ? false : true; timeout = 60; printf("Game (un/)paused!"); } break;
+                case (SDLK_RETURN): handleReturn(); break;
             }
         }
+
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
         SDL_RenderClear(renderer);
         for (int i = 0; i < map->length; i++)
@@ -158,17 +229,6 @@ int main(int argc, char **argv) {
 
         if (timeout != 0) timeout--;
 
-        if (!pause)
-        {
-            if (i == 15)
-            {
-                i = 0;
-                movePlayer(game.player, &game);
-                moveGhosts(game.ghost, &game);
-            }
-            i++;
-        }
-
         struct PowerUp *powerUp = game.powerUp;
         SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
         while(powerUp)
@@ -181,7 +241,7 @@ int main(int argc, char **argv) {
         struct Ghost *ghost = game.ghost;
         while(ghost)
         {
-            renderTexture(ghostTexture, renderer, ghost->pos.y * 20, ghost->pos.x * 20);
+            renderTexture(ghostTexture, ghost->pos.y * 20, ghost->pos.x * 20);
             ghost = ghost->next;
         }
 
@@ -198,12 +258,29 @@ int main(int argc, char **argv) {
             tail = tail->tail;
         }
 
+        if (!alive)
+        {
+            renderMenu();
+        }else if (pause){
+            darkenBackground();
+            renderText("GAME PAUSED", 0, 0, white, 1);
+        }else{
+            if (i == 15)
+            {
+                i = 0;
+                movePlayer(game.player, &game);
+                moveGhosts(game.ghost, &game);
+            }
+            i++;
+        }
+
         SDL_RenderPresent(renderer);
     }
     //SDL_FreeSurface(screen);
     //SDL_FreeSurface(Ghost);
     //screen=NULL;
     //Ghost=NULL;
+    TTF_CloseFont(font);
     SDL_DestroyWindow(window);
     SDL_Quit;
 
