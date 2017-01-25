@@ -113,11 +113,17 @@ struct GameState *resetGame(struct GameState *state){
     state->running = true;
     state->pause = false;
     state->pauseTimeout = 60;
-
+    state->speed = 15;
+    state->powerUpSlowerTime = -1;
+    state->powerUpFasterTime = -1;
+    state->powerUpEatGhostsTime = -1;
+    state->powerUpEatWallTime = -1;
     // create init powerups
     spawnPowerup(GROW, 0, state);
     spawnPowerup(GHOSTS_TO_CENTER, 0, state);
-    spawnPowerup(GROW, 0, state);
+    spawnPowerup(SLOWER, 150, state);
+    spawnPowerup(SLOWER, 150, state);
+    spawnPowerup(FASTER, 150, state);
 
     return state;
 }
@@ -250,9 +256,9 @@ int main(int argc, char **argv) {
         if (game->pauseTimeout != 0) game->pauseTimeout--;
 
         struct PowerUp *powerUp = game->powerUp;
-        SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
         while(powerUp)
         {
+            setPowerUpSDLRenderColor(renderer, powerUp);
             SDL_Rect powerUpRect = {powerUp->pos.y * 20, powerUp->pos.x*20, 20, 20};
             SDL_RenderFillRect(renderer, &powerUpRect);
             powerUp = powerUp->next;
@@ -285,7 +291,7 @@ int main(int argc, char **argv) {
             darkenBackground();
             renderText("GAME PAUSED", 0, 0, white, 1);
         }else{
-            if (i == 15)
+            if (i == game->speed)
             {
                 i = 0;
                 movePlayer(game->player, game);

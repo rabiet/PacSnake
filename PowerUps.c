@@ -78,8 +78,18 @@ void spawnPowerup(enum PowerUpType type, int t, struct GameState *state){
 void takePowerup(struct PowerUp *powerUp, struct GameState *state){
     switch (powerUp->type) {
         case EAT_GHOSTS: break;
-        case SLOWER: break;
-        case FASTER: break;
+        case SLOWER:
+            if(state->powerUpSlowerTime == 0){
+                state->speed += 10;
+            }
+            state->powerUpSlowerTime += powerUp->time;
+            break;
+        case FASTER:
+            if(state->powerUpFasterTime == 0){
+                state->speed -= 5;
+            }
+            state->powerUpFasterTime += powerUp->time;
+            break;
         case GHOSTS_TO_CENTER:
             moveGhostsHome(state->ghost, state);
             break;
@@ -91,7 +101,7 @@ void takePowerup(struct PowerUp *powerUp, struct GameState *state){
     }
 
     removePowerup(powerUp, state);
-    spawnPowerup(GROW, 20, state);
+    spawnPowerup(GROW, 0, state);
 }
 
 void takePowerupPos(struct Position pos, struct GameState *state){
@@ -102,5 +112,54 @@ void takePowerupPos(struct Position pos, struct GameState *state){
             takePowerup(powerUp, state);
         }
         powerUp = powerUp->next;
+    }
+}
+
+void updateTimedPowerUps(struct GameState *state){
+    if(state->powerUpSlowerTime == 1){
+        state->speed -= 10;
+    }
+
+    if(state->powerUpFasterTime == 1){
+        state->speed += 5;
+    }
+
+    if(state->powerUpSlowerTime > 0){
+        state->powerUpSlowerTime--;
+    }
+    if(state->powerUpFasterTime > 0){
+        state->powerUpFasterTime--;
+    }
+    if(state->powerUpEatGhostsTime > 0){
+        state->powerUpEatGhostsTime--;
+    }
+    if(state->powerUpEatWallTime > 0){
+        state->powerUpEatWallTime--;
+    }
+}
+
+void setPowerUpSDLRenderColor(struct SDL_Renderer *renderer, struct PowerUp *powerUp){
+    switch (powerUp->type) {
+        case EAT_GHOSTS:
+            SDL_SetRenderDrawColor(renderer, 76, 175, 80, 255);
+            break;
+        case SLOWER:
+            SDL_SetRenderDrawColor(renderer, 121, 85, 72, 255);
+            break;
+        case FASTER:
+            SDL_SetRenderDrawColor(renderer, 255, 152, 0, 255);
+            break;
+        case GHOSTS_TO_CENTER:
+            SDL_SetRenderDrawColor(renderer, 245, 0, 87, 255);
+            break;
+        case TURNAROUND:
+            SDL_SetRenderDrawColor(renderer, 0, 150, 136, 255);
+            break;
+        case EAT_WALL:
+            SDL_SetRenderDrawColor(renderer, 244, 67, 54, 255);
+            break;
+        case GROW:
+            SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
+            break;
     }
 }

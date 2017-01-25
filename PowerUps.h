@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "Ghosts.h"
 #include "PacSnake.h"
+#include <SDL2/SDL.h>
 
 enum PowerUpType {
     GROW,
@@ -28,5 +29,7 @@ int isPowerupPos(struct PowerUp *powerUp, struct Position pos);
 void takePowerupPos(struct Position pos, struct GameState *state);
 void takePowerup(struct PowerUp *powerUp, struct GameState *state);
 void spawnPowerup(enum PowerUpType type, int time, struct GameState *state);
+void updateTimedPowerUps(struct GameState *state);
+void setPowerUpSDLRenderColor(struct SDL_Renderer *renderer, struct PowerUp *powerUp);
 
 #endif

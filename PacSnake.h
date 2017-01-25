@@ -12,6 +12,11 @@ struct GameState {
     struct Ghost *ghost;
     struct Player *player;
     struct PowerUp *powerUp;
+    int speed;
+    int powerUpSlowerTime;
+    int powerUpFasterTime;
+    int powerUpEatGhostsTime;
+    int powerUpEatWallTime;
     bool alive;
     bool running;
     bool pause;
