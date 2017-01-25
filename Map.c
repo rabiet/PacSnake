@@ -127,3 +127,7 @@ int isOutOfMap(struct Map *map, struct Position pos){
 
     return 0;
 }
+
+void removeWall(struct Map *map, struct Position pos){
+    map->fields[map->width*pos.x + pos.y] = FREE;
+}

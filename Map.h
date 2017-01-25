@@ -4,9 +4,7 @@
 
 enum MapFieldTypes {
     WALL,
-    FREE,
-    GHOST,
-    PLAYER
+    FREE
 };
 
 struct Map {
@@ -24,5 +22,7 @@ void unloadMap(struct Map *map);
 int isWall(struct Map *map, struct Position pos);
 
 int isOutOfMap(struct Map *map, struct Position pos);
+
+void removeWall(struct Map *map, struct Position pos);
 
 #endif

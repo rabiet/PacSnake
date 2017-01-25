@@ -94,7 +94,8 @@ void takePowerup(struct PowerUp *powerUp, struct GameState *state){
             moveGhostsHome(state->ghost, state);
             break;
         case TURNAROUND: break;
-        case EAT_WALL: break;
+        case EAT_WALL:
+            state->powerUpEatWallTime += powerUp->time;
         case GROW:
             growTail(state->player);
             break;

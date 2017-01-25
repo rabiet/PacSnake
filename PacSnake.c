@@ -121,9 +121,10 @@ struct GameState *resetGame(struct GameState *state){
     // create init powerups
     spawnPowerup(GROW, 0, state);
     spawnPowerup(GHOSTS_TO_CENTER, 0, state);
-    spawnPowerup(SLOWER, 150, state);
-    spawnPowerup(SLOWER, 150, state);
-    spawnPowerup(FASTER, 150, state);
+    spawnPowerup(SLOWER, 50, state);
+    spawnPowerup(EAT_WALL, 20, state);
+    spawnPowerup(SLOWER, 50, state);
+    spawnPowerup(FASTER, 50, state);
 
     return state;
 }
@@ -240,14 +241,23 @@ int main(int argc, char **argv) {
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
         SDL_RenderClear(renderer);
-        for (int i = 0; i < game->map->length; i++)
+        for (int k = 0; k < game->map->length; k++)
         {
             for (int j = 0; j < game->map->width; j++)
             {
-                if (game->map->fields[(i * game->map->width) + j] == 0)
-                {
+                // let the walls blink if the eat wall powerup is active
+                if(game->powerUpEatWallTime <= 0){
                     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-                    SDL_Rect wall = {20 * j, 20 * i, 20, 20};
+                }else{
+                    if(game->powerUpEatWallTime % 2 == 0){
+                        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                    }else{
+                        SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
+                    }
+                }
+                if (game->map->fields[(k * game->map->width) + j] == 0)
+                {
+                    SDL_Rect wall = {20 * j, 20 * k, 20, 20};
                     SDL_RenderFillRect(renderer, &wall);
                 }
             }
@@ -296,6 +306,7 @@ int main(int argc, char **argv) {
                 i = 0;
                 movePlayer(game->player, game);
                 moveGhosts(game->ghost, game);
+                updateTimedPowerUps(game);
             }
             i++;
         }
