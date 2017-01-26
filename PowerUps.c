@@ -101,11 +101,35 @@ void takePowerup(struct PowerUp *powerUp, struct GameState *state){
             break;
         case GROW:
             growTail(state->player);
+            spawnRandomPowerup(state);
+            spawnPowerup(GROW, 0, state);
             break;
     }
 
     removePowerup(powerUp, state);
-    spawnPowerup(GROW, 0, state);
+}
+
+void spawnRandomPowerup(struct GameState *state){
+    switch(rand() % 6){
+        case 0:
+            spawnPowerup(EAT_GHOSTS, 50, state);
+            break;
+        case 1:
+            spawnPowerup(SLOWER, 50, state);
+            break;
+        case 2:
+            spawnPowerup(FASTER, 50, state);
+            break;
+        case 3:
+            spawnPowerup(GHOSTS_TO_CENTER, 0, state);
+            break;
+        case 4:
+            spawnPowerup(TURNAROUND, 0, state);
+            break;
+        case 5:
+            spawnPowerup(EAT_WALL, 20, state);
+            break;
+    }
 }
 
 void takePowerupPos(struct Position pos, struct GameState *state){

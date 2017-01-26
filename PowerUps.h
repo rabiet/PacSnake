@@ -31,5 +31,6 @@ void takePowerup(struct PowerUp *powerUp, struct GameState *state);
 void spawnPowerup(enum PowerUpType type, int time, struct GameState *state);
 void updateTimedPowerUps(struct GameState *state);
 void setPowerUpSDLRenderColor(struct SDL_Renderer *renderer, struct PowerUp *powerUp);
+void spawnRandomPowerup(struct GameState *state);
 
 #endif

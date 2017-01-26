@@ -120,12 +120,8 @@ struct GameState *resetGame(struct GameState *state){
     state->powerUpEatWallTime = -1;
     // create init powerups
     spawnPowerup(GROW, 0, state);
-    spawnPowerup(GHOSTS_TO_CENTER, 0, state);
-    spawnPowerup(SLOWER, 50, state);
-    spawnPowerup(EAT_WALL, 20, state);
-    spawnPowerup(SLOWER, 50, state);
-    spawnPowerup(FASTER, 50, state);
-    spawnPowerup(EAT_GHOSTS, 50, state);
+    spawnPowerup(GROW, 0, state);
+    spawnPowerup(GROW, 0, state);
 
     return state;
 }
