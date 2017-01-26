@@ -22,6 +22,7 @@ int height;
 int fieldHeight;
 int fieldWidth;
 int offset;
+int score;
 
 SDL_Color white = {255, 255, 255, 255};
 SDL_Color red   = {255, 0, 0, 255};
@@ -39,6 +40,7 @@ struct GameState *resetGame(struct GameState *state){
         }
         state->ghost = NULL;
     }
+    score = 0;
 
     // create the ghosts
     struct Ghost *ghost = malloc(sizeof(struct Ghost));
@@ -158,8 +160,10 @@ void handleReturn(struct GameState *state)
     }
 }
 
-void renderText(const char *text, int x, int y, SDL_Color color, int center)
+void renderText(const char *text, int x, int y, SDL_Color color, int center, int size)
 {
+    if (size == 0) size = (width / 10);
+    font = TTF_OpenFont("consola.ttf", size);
     SDL_Surface *pauseText = TTF_RenderText_Solid(font, text, color);
     SDL_Texture* textT = SDL_CreateTextureFromSurface(renderer, pauseText);
     SDL_FreeSurface(pauseText);
@@ -186,8 +190,8 @@ void darkenBackground()
 void renderMenu()
 {
     darkenBackground();
-    renderText("New Game", -1, height / 2 - (width / 10), (selected == 1) ? white : red, 2);
-    renderText("Exit", -1, height / 2 + (width / 10), (selected == 0) ? white : red, 2);
+    renderText("New Game", -1, height / 2 - (width / 10), (selected == 1) ? white : red, 2, 0);
+    renderText("Exit", -1, height / 2 + (width / 10), (selected == 0) ? white : red, 2, 0);
 }
 
 int main(int argc, char **argv) {
@@ -220,8 +224,6 @@ int main(int argc, char **argv) {
     SDL_Window *window = SDL_CreateWindow("PacSnake", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-    font = TTF_OpenFont("consola.ttf", (width / 10));
-
     SDL_Texture *ghostTexture;
     SDL_Surface *imageLoader = SDL_LoadBMP("ghost.bmp");;
     ghostTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
@@ -252,15 +254,7 @@ int main(int argc, char **argv) {
         }
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
         SDL_RenderClear(renderer);
-        /*SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_Rect field;
-        field.h = height;
-        field.w = offset;
-        field.x = 0;
-        field.y = 0;
-        SDL_RenderFillRect(renderer, &field);
-        field.x = offset + fieldWidth;
-        SDL_RenderFillRect(renderer, &field);*/
+
         for (int k = 0; k < game->map->length; k++)
         {
             for (int j = 0; j < game->map->width; j++)
@@ -307,19 +301,25 @@ int main(int argc, char **argv) {
 
         struct Tail *tail = game->player->tail;
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        score = 0;
         while(tail)
         {
             SDL_Rect schwanz = {tail->pos.y * fieldWidth + offset, tail->pos.x*fieldHeight, fieldWidth, fieldHeight};
             SDL_RenderFillRect(renderer, &schwanz);
             tail = tail->tail;
+            score++;
         }
+
+        char *scoreText =(char*) malloc(13 * sizeof(char));;
+        sprintf(scoreText, "%s %d", "Score: ", score);
+        renderText(scoreText, 0, 0, white, 0, (width / 30));
 
         if (!game->alive)
         {
             renderMenu();
         }else if (game->pause){
             darkenBackground();
-            renderText("GAME PAUSED", 0, 0, white, 1);
+            renderText("GAME PAUSED", 0, 0, white, 1, 0);
         }else{
             if (i == game->speed)
             {
