@@ -19,6 +19,9 @@ SDL_Renderer *renderer;
 
 int width;
 int height;
+int fieldHeight;
+int fieldWidth;
+int offset;
 
 SDL_Color white = {255, 255, 255, 255};
 SDL_Color red   = {255, 0, 0, 255};
@@ -130,8 +133,8 @@ void renderTexture(SDL_Texture *texture, int x, int y)
     SDL_Rect helperRect;
     helperRect.x = x;
     helperRect.y = y;
-    helperRect.h = 20;
-    helperRect.w = 20;
+    helperRect.h = fieldHeight;
+    helperRect.w = fieldWidth;
     SDL_RenderCopy(renderer, texture, NULL, &helperRect);
 }
 
@@ -161,7 +164,7 @@ void renderText(const char *text, int x, int y, SDL_Color color, int center)
     SDL_Texture* textT = SDL_CreateTextureFromSurface(renderer, pauseText);
     SDL_FreeSurface(pauseText);
     SDL_Rect rect;
-    SDL_QueryTexture( textT, NULL, NULL, &rect.w, &rect.h );
+    SDL_QueryTexture(textT, NULL, NULL, &rect.w, &rect.h);
     switch (center)
     {
         case 0: rect.x = x; rect.y = y; break;                                              // Not centered, use x and y
@@ -183,8 +186,8 @@ void darkenBackground()
 void renderMenu()
 {
     darkenBackground();
-    renderText("New Game", -1, height / 2 - 50, (selected == 1) ? white : red, 2);
-    renderText("Exit", -1, height / 2 + 50, (selected == 0) ? white : red, 2);
+    renderText("New Game", -1, height / 2 - (width / 10), (selected == 1) ? white : red, 2);
+    renderText("Exit", -1, height / 2 + (width / 10), (selected == 0) ? white : red, 2);
 }
 
 int main(int argc, char **argv) {
@@ -196,16 +199,28 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    width = 20 * game->map->width;
-    height = 20 * game->map->length;
-
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
 
-    SDL_Window *window = SDL_CreateWindow("PacSnake", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_OPENGL);
+    SDL_Rect r;
+    if (SDL_GetDisplayBounds(0, &r) != 0) {
+        SDL_Log("SDL_GetDisplayBounds failed: %s", SDL_GetError());
+        return 1;
+    }
+
+    width = r.w;
+    height = r.h;
+    fieldHeight = height / game->map->length;
+    fieldWidth = fieldHeight;
+    offset = (width / 2) - (fieldWidth * (game->map->width / 2));
+
+    printf("width: %d\nheight: %d\nfieldHeight: %d\noffset: %d\nlength: %d\nwidth: %d\n", width, height, fieldHeight, offset, game->map->length, game->map->width);
+
+
+    SDL_Window *window = SDL_CreateWindow("PacSnake", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-    font = TTF_OpenFont("consola.ttf", 50);
+    font = TTF_OpenFont("consola.ttf", (width / 10));
 
     SDL_Texture *ghostTexture;
     SDL_Surface *imageLoader = SDL_LoadBMP("ghost.bmp");;
@@ -235,9 +250,17 @@ int main(int argc, char **argv) {
                 case (SDLK_RETURN): handleReturn(game); break;
             }
         }
-
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
         SDL_RenderClear(renderer);
+        /*SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_Rect field;
+        field.h = height;
+        field.w = offset;
+        field.x = 0;
+        field.y = 0;
+        SDL_RenderFillRect(renderer, &field);
+        field.x = offset + fieldWidth;
+        SDL_RenderFillRect(renderer, &field);*/
         for (int k = 0; k < game->map->length; k++)
         {
             for (int j = 0; j < game->map->width; j++)
@@ -254,7 +277,7 @@ int main(int argc, char **argv) {
                 }
                 if (game->map->fields[(k * game->map->width) + j] == 0)
                 {
-                    SDL_Rect wall = {20 * j, 20 * k, 20, 20};
+                    SDL_Rect wall = {fieldWidth * j + offset, fieldHeight * k, fieldWidth, fieldHeight};
                     SDL_RenderFillRect(renderer, &wall);
                 }
             }
@@ -266,7 +289,7 @@ int main(int argc, char **argv) {
         while(powerUp)
         {
             setPowerUpSDLRenderColor(renderer, powerUp);
-            SDL_Rect powerUpRect = {powerUp->pos.y * 20, powerUp->pos.x*20, 20, 20};
+            SDL_Rect powerUpRect = {powerUp->pos.y * fieldWidth + offset, powerUp->pos.x*fieldHeight, fieldWidth, fieldHeight};
             SDL_RenderFillRect(renderer, &powerUpRect);
             powerUp = powerUp->next;
         }
@@ -274,19 +297,19 @@ int main(int argc, char **argv) {
         struct Ghost *ghost = game->ghost;
         while(ghost)
         {
-            renderTexture(ghostTexture, ghost->pos.y * 20, ghost->pos.x * 20);
+            renderTexture(ghostTexture, ghost->pos.y * fieldWidth + offset, ghost->pos.x * fieldHeight);
             ghost = ghost->next;
         }
 
         SDL_SetRenderDrawColor(renderer, 255, 110, 110, 255);
-        SDL_Rect snek = {game->player->head.y * 20, game->player->head.x * 20, 20, 20};
+        SDL_Rect snek = {game->player->head.y * fieldWidth + offset, game->player->head.x * fieldHeight, fieldWidth, fieldHeight};
         SDL_RenderFillRect(renderer, &snek);
 
         struct Tail *tail = game->player->tail;
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         while(tail)
         {
-            SDL_Rect schwanz = {tail->pos.y * 20, tail->pos.x*20, 20, 20};
+            SDL_Rect schwanz = {tail->pos.y * fieldWidth + offset, tail->pos.x*fieldHeight, fieldWidth, fieldHeight};
             SDL_RenderFillRect(renderer, &schwanz);
             tail = tail->tail;
         }
