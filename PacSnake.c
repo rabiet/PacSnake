@@ -169,6 +169,7 @@ void renderText(const char *text, int x, int y, SDL_Color color, int center)
         case 2: rect.x = width / 2 - rect.w / 2; rect.y = y; break;                         // Centered horizontally
     }
     SDL_RenderCopy(renderer, textT, NULL, &rect);
+    SDL_DestroyTexture(textT);
 }
 
 void darkenBackground()
