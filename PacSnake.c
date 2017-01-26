@@ -225,8 +225,35 @@ int main(int argc, char **argv) {
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     SDL_Texture *ghostTexture;
+    SDL_Texture *speedDownTexture;
+    SDL_Texture *speedUpTexture;
+    SDL_Texture *eatEnemyTexture;
+    SDL_Texture *homeTexture;
+    SDL_Texture *turnTexture;
+
+
     SDL_Surface *imageLoader = SDL_LoadBMP("ghost.bmp");;
     ghostTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
+    SDL_FreeSurface(imageLoader);
+
+    imageLoader = SDL_LoadBMP("eatEnemy.bmp");;
+    eatEnemyTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
+    SDL_FreeSurface(imageLoader);
+
+    imageLoader = SDL_LoadBMP("speedUp.bmp");;
+    speedUpTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
+    SDL_FreeSurface(imageLoader);
+    
+    imageLoader = SDL_LoadBMP("speedDown.bmp");;
+    speedDownTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
+    SDL_FreeSurface(imageLoader);
+
+    imageLoader = SDL_LoadBMP("home.bmp");
+    homeTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
+    SDL_FreeSurface(imageLoader);
+
+    imageLoader = SDL_LoadBMP("turn.bmp");
+    turnTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
     SDL_FreeSurface(imageLoader);
 
     int i = 0;
@@ -282,9 +309,30 @@ int main(int argc, char **argv) {
         struct PowerUp *powerUp = game->powerUp;
         while(powerUp)
         {
-            setPowerUpSDLRenderColor(renderer, powerUp);
-            SDL_Rect powerUpRect = {powerUp->pos.y * fieldWidth + offset, powerUp->pos.x*fieldHeight, fieldWidth, fieldHeight};
-            SDL_RenderFillRect(renderer, &powerUpRect);
+            switch (powerUp->type)
+            {
+                case EAT_GHOSTS:
+                    renderTexture(eatEnemyTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight);
+                    break;
+                case SLOWER:
+                    renderTexture(speedDownTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight);
+                    break;
+                case FASTER:
+                    renderTexture(speedUpTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight);
+                    break;
+                case GHOSTS_TO_CENTER:
+                    renderTexture(homeTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight);
+                    break;
+                case TURNAROUND:
+                    renderTexture(turnTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight);
+                    break;
+                default:
+                    setPowerUpSDLRenderColor(renderer, powerUp);
+                    SDL_Rect powerUpRect = {powerUp->pos.y * fieldWidth + offset, powerUp->pos.x*fieldHeight, fieldWidth, fieldHeight};
+                    SDL_RenderFillRect(renderer, &powerUpRect);
+                    break;
+
+            }
             powerUp = powerUp->next;
         }
 
