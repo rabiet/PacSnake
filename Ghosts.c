@@ -105,14 +105,14 @@ void moveGhosts(struct Ghost *ghost, struct GameState *game) {
     moveGhost(ghost, game);
 }
 
-void moveGhostHome(struct Ghost *ghost, struct GameState *game) {
+void moveGhostHome(struct Ghost *ghost) {
     ghost->pos = ghost->homePos;
 }
 
-void moveGhostsHome(struct Ghost *ghost, struct GameState *game) {
+void moveGhostsHome(struct Ghost *ghost) {
     while(ghost->next){
-        moveGhostHome(ghost, game);
+        moveGhostHome(ghost);
         ghost = ghost->next;
     }
-    moveGhostHome(ghost, game);
+    moveGhostHome(ghost);
 }

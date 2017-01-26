@@ -35,7 +35,7 @@ int main(int argc, char const *argv[]) {
 
 
     // read the equations from the file
-    long *equations = malloc(sizeof(long) * n *k);
+    int *equations = malloc(sizeof(int) * n *k);
     for(int i = 0; i < n*k; i++){
         fscanf(file, "%d", equations+i);
     }

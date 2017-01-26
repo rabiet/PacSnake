@@ -125,6 +125,7 @@ struct GameState *resetGame(struct GameState *state){
     spawnPowerup(EAT_WALL, 20, state);
     spawnPowerup(SLOWER, 50, state);
     spawnPowerup(FASTER, 50, state);
+    spawnPowerup(EAT_GHOSTS, 50, state);
 
     return state;
 }

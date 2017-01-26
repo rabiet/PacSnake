@@ -77,7 +77,9 @@ void spawnPowerup(enum PowerUpType type, int t, struct GameState *state){
 
 void takePowerup(struct PowerUp *powerUp, struct GameState *state){
     switch (powerUp->type) {
-        case EAT_GHOSTS: break;
+        case EAT_GHOSTS:
+            state->powerUpEatGhostsTime += powerUp->time;
+            break;
         case SLOWER:
             if(state->powerUpSlowerTime == 0){
                 state->speed += 10;
@@ -91,11 +93,12 @@ void takePowerup(struct PowerUp *powerUp, struct GameState *state){
             state->powerUpFasterTime += powerUp->time;
             break;
         case GHOSTS_TO_CENTER:
-            moveGhostsHome(state->ghost, state);
+            moveGhostsHome(state->ghost);
             break;
         case TURNAROUND: break;
         case EAT_WALL:
             state->powerUpEatWallTime += powerUp->time;
+            break;
         case GROW:
             growTail(state->player);
             break;

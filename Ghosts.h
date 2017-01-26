@@ -6,7 +6,8 @@
 
 void moveGhosts(struct Ghost *ghost, struct GameState *game);
 void moveGhost(struct Ghost *ghost, struct GameState *game);
-void moveGhostsHome(struct Ghost *ghost, struct GameState *game);
-void moveGhostHome(struct Ghost *ghost, struct GameState *game);
+void moveGhostsHome(struct Ghost *ghost);
+void moveGhostsHomePos(struct Ghost *ghost, struct Position pos);
+void moveGhostHome(struct Ghost *ghost);
 
 #endif

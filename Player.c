@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "Player.h"
+#include "Ghosts.h"
 #include "Map.h"
 
 void printPlayerPos(struct Player *player){
@@ -75,6 +76,16 @@ void movePlayer(struct Player *player, struct GameState *game){
 
     if(game->powerUpEatWallTime > 0){
         removeWall(game->map, player->head);
+    }
+
+    if(game->powerUpEatGhostsTime > 0){
+        struct Ghost *ghost = game->ghost;
+        while(ghost->next){
+            if(isPlayerPos(game->player, ghost->pos)){
+                moveGhostHome(ghost);
+            }
+            ghost = ghost->next;
+        }
     }
 
     if(isWall(game->map, player->head) || isTailPos(game->player->tail, player->head)){
