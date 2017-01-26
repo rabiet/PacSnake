@@ -5,7 +5,6 @@
 #include "PacSnake.h"
 
 struct Player {
-  int length;
   struct Position head;
   enum Direction direction;
   struct Tail *tail;

@@ -124,8 +124,6 @@ void growTail(struct Player *player){
         tail->pos = lastTail->pos;
         lastTail->tail = tail;
     }
-
-    player->length++;
 }
 
 void turnPlayer(struct Player *player, enum Direction direction){

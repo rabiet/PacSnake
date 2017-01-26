@@ -18,7 +18,6 @@ enum PowerUpType {
 };
 
 struct PowerUp {
-  int id;
   int time;
   struct Position pos;
   enum PowerUpType type;

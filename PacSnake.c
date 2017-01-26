@@ -82,7 +82,6 @@ struct GameState *resetGame(struct GameState *state){
     struct Tail *tail2 = malloc(sizeof(struct Tail));
     struct Tail *tail3 = malloc(sizeof(struct Tail));
 
-    player->length = 4;
     player->head.x = 1;
     player->head.y = 2;
     player->direction = RIGHT;
@@ -310,10 +309,6 @@ int main(int argc, char **argv) {
 
         SDL_RenderPresent(renderer);
     }
-    //SDL_FreeSurface(screen);
-    //SDL_FreeSurface(Ghost);
-    //screen=NULL;
-    //Ghost=NULL;
     TTF_CloseFont(font);
     SDL_DestroyWindow(window);
     SDL_Quit;
