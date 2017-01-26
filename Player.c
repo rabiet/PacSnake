@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "Player.h"
 #include "Ghosts.h"
+#include "Position.h"
 #include "Map.h"
 
 void printPlayerPos(struct Player *player){
@@ -155,8 +156,17 @@ void growTail(struct Player *player){
     }
 }
 
+int couldPlayerMove(struct Player *player, enum Direction direction)
+{
+    if (player->direction == UP && direction == DOWN) return false;
+    if (player->direction == DOWN && direction == UP) return false;
+    if (player->direction == RIGHT && direction == LEFT) return false;
+    if (player->direction == LEFT && direction == RIGHT) return false;
+    return true;
+}
+
 void turnPlayer(struct Player *player, enum Direction direction){
-    player->direction = direction;
+    if (couldPlayerMove(player, direction)) { player->direction = direction; }
 }
 
 void removeTails(struct Tail *tail){

@@ -230,6 +230,8 @@ int main(int argc, char **argv) {
     SDL_Texture *eatEnemyTexture;
     SDL_Texture *homeTexture;
     SDL_Texture *turnTexture;
+    SDL_Texture *eatWallTexture;
+    SDL_Texture *pointTexture;
 
 
     SDL_Surface *imageLoader = SDL_LoadBMP("ghost.bmp");;
@@ -256,9 +258,19 @@ int main(int argc, char **argv) {
     turnTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
     SDL_FreeSurface(imageLoader);
 
+    imageLoader = SDL_LoadBMP("eatWall.bmp");
+    eatWallTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
+    SDL_FreeSurface(imageLoader);
+
+    imageLoader = SDL_LoadBMP("points.bmp");
+    pointTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
+    SDL_FreeSurface(imageLoader);
+
+
     int i = 0;
     SDL_Event event;
-    printf("\n\n\n\t\t\t\tPress Enter to start the game!\n\n\n");
+
+
     while (game->running)
     {
         while (SDL_PollEvent(&event))
@@ -325,6 +337,12 @@ int main(int argc, char **argv) {
                     break;
                 case TURNAROUND:
                     renderTexture(turnTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight);
+                    break;
+                case EAT_WALL:
+                    renderTexture(eatWallTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight);
+                    break;
+                case GROW:
+                    renderTexture(pointTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight);
                     break;
                 default:
                     setPowerUpSDLRenderColor(renderer, powerUp);
