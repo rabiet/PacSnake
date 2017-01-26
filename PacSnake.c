@@ -45,6 +45,7 @@ struct GameState *resetGame(struct GameState *state){
     // create the ghosts
     struct Ghost *ghost = malloc(sizeof(struct Ghost));
     struct Ghost *ghost2 = malloc(sizeof(struct Ghost));
+    struct Ghost *ghost3 = malloc(sizeof(struct Ghost));
 
     ghost->pos.x = 14;
     ghost->pos.y = 15;
@@ -58,7 +59,14 @@ struct GameState *resetGame(struct GameState *state){
     ghost2->direction = DOWN;
     ghost2->homePos.x = 14;
     ghost2->homePos.y = 12;
-    ghost2->next = NULL;
+    ghost2->next = ghost3;
+
+    ghost3->pos.x = 15;
+    ghost3->pos.y = 13;
+    ghost3->direction = LEFT;
+    ghost3->homePos.x = 14;
+    ghost3->homePos.y = 12;
+    ghost3->next = NULL;
 
     // free old map
     if(state && state->map){
@@ -118,10 +126,10 @@ struct GameState *resetGame(struct GameState *state){
     state->pause = false;
     state->pauseTimeout = 60;
     state->speed = 15;
-    state->powerUpSlowerTime = -1;
-    state->powerUpFasterTime = -1;
-    state->powerUpEatGhostsTime = -1;
-    state->powerUpEatWallTime = -1;
+    state->powerUpSlowerTime = 0;
+    state->powerUpFasterTime = 0;
+    state->powerUpEatGhostsTime = 0;
+    state->powerUpEatWallTime = 0;
     // create init powerups
     spawnPowerup(GROW, 0, state);
     spawnPowerup(GROW, 0, state);
@@ -387,6 +395,7 @@ int main(int argc, char **argv) {
             darkenBackground();
             renderText("GAME PAUSED", 0, 0, white, 1, 0);
         }else{
+            printf("I: %d\nSPEED: %d\n\n", i, game->speed);
             if (i == game->speed)
             {
                 i = 0;
