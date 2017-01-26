@@ -23,6 +23,7 @@ int fieldHeight;
 int fieldWidth;
 int offset;
 int score;
+bool symbols;
 
 SDL_Color white = {255, 255, 255, 255};
 SDL_Color red   = {255, 0, 0, 255};
@@ -138,13 +139,13 @@ struct GameState *resetGame(struct GameState *state){
     return state;
 }
 
-void renderTexture(SDL_Texture *texture, int x, int y)
+void renderTexture(SDL_Texture *texture, int x, int y, int h, int w)
 {
     SDL_Rect helperRect;
     helperRect.x = x;
     helperRect.y = y;
-    helperRect.h = fieldHeight;
-    helperRect.w = fieldWidth;
+    helperRect.h = (h != 0) ? h : fieldHeight;
+    helperRect.w = (w != 0) ? w : fieldWidth;
     SDL_RenderCopy(renderer, texture, NULL, &helperRect);
 }
 
@@ -152,12 +153,19 @@ void handleReturn(struct GameState *state)
 {
     if (!state->alive)
     {
-        if (selected == 0)
+        switch (selected)
         {
-            state = resetGame(state);
-            state->alive = true;
+            case 0:
+                state = resetGame(state);
+                state->alive = true;
+                break;
+            case 1:
+                symbols = true;
+                break;
+            case 2:
+                state->running = false;
+                break;
         }
-        else state->running = false;
     }else{
         if (state->pauseTimeout == 0)
         {
@@ -198,8 +206,9 @@ void darkenBackground()
 void renderMenu()
 {
     darkenBackground();
-    renderText("New Game", -1, height / 2 - (width / 10), (selected == 1) ? white : red, 2, 0);
-    renderText("Exit", -1, height / 2 + (width / 10), (selected == 0) ? white : red, 2, 0);
+    renderText("New Game", -1, height / 2 - (width / 8), (selected == 0) ? red : white, 2, 0);
+    renderText("Symbols", -1, height / 2, (selected == 1) ? red : white, 2, 0);
+    renderText("Exit", -1, height / 2 + (width / 8), (selected == 2) ? red : white, 2, 0);
 }
 
 int main(int argc, char **argv) {
@@ -288,13 +297,14 @@ int main(int argc, char **argv) {
             switch (event.key.keysym.sym)
             {
                 case (SDLK_UP):
-                case (SDLK_w): if (game->alive) turnPlayer(game->player, UP); else { if (selected != 0) selected--;} break;
+                case (SDLK_w): if (game->alive) turnPlayer(game->player, UP); else { if (selected != 0 && game->pauseTimeout == 0) selected--; game->pauseTimeout = 10; } break;
                 case (SDLK_DOWN):
-                case (SDLK_s): if (game->alive) turnPlayer(game->player, DOWN); else { if (selected != 1) selected++;} break;
+                case (SDLK_s): if (game->alive) turnPlayer(game->player, DOWN); else { if (selected != 2 && game->pauseTimeout == 0) selected++; game->pauseTimeout = 10; } break;
                 case (SDLK_LEFT):
                 case (SDLK_a): turnPlayer(game->player, LEFT); break;
                 case (SDLK_RIGHT):
                 case (SDLK_d): turnPlayer(game->player, RIGHT); break;
+                case (SDLK_BACKSPACE): symbols = false; break;
                 case (SDLK_ESCAPE): game->running = false; break;
                 case (SDLK_RETURN): handleReturn(game); break;
             }
@@ -302,110 +312,158 @@ int main(int argc, char **argv) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
         SDL_RenderClear(renderer);
 
-        for (int k = 0; k < game->map->length; k++)
+        if (symbols)
         {
-            for (int j = 0; j < game->map->width; j++)
+            renderTexture(homeTexture, fieldHeight * 6, fieldWidth * 2, fieldHeight * 3, fieldWidth * 3);
+            renderText("Sends all ghosts home", fieldHeight * 10, fieldHeight * 3, white, 0, width / 30);
+            renderTexture(speedDownTexture, fieldHeight * 6, fieldWidth * 6, fieldHeight * 3, fieldWidth * 3);
+            renderText("Slows down time and the universe", fieldHeight * 10, fieldHeight * 7, white, 0, width / 30);
+            renderTexture(speedUpTexture, fieldHeight * 6, fieldWidth * 10, fieldHeight * 3, fieldWidth * 3);
+            renderText("Speeds everything up", fieldHeight * 10, fieldHeight * 11, white, 0, width / 30);
+            renderTexture(eatEnemyTexture, fieldHeight * 6, fieldWidth * 14, fieldHeight * 3, fieldWidth * 3);
+            renderText("Gives you time to eat your enemies", fieldHeight * 10, fieldHeight * 15, white, 0, width / 30);
+            renderTexture(turnTexture, fieldHeight * 6, fieldWidth * 18, fieldHeight * 3, fieldWidth * 3);
+            renderText("Turns you around 180-Style", fieldHeight * 10, fieldHeight * 19, white, 0, width / 30);
+            renderTexture(eatWallTexture, fieldHeight * 6, fieldWidth * 22, fieldHeight * 3, fieldWidth * 3);
+            renderText("Lets you eat walls... for a while", fieldHeight * 10, fieldHeight * 23, white, 0, width / 30);
+            renderTexture(pointTexture, fieldHeight * 6, fieldWidth * 26, fieldHeight * 3, fieldWidth * 3);
+            renderText("Enlarges you and raises your score", fieldHeight * 10, fieldHeight * 27, white, 0, width / 30);
+            
+            renderText("Back", fieldHeight, fieldHeight, red, 0, width / 25);
+        }else{
+            for (int k = 0; k < game->map->length; k++)
             {
-                // let the walls blink if the eat wall powerup is active
-                if(game->powerUpEatWallTime <= 0){
-                    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-                }else{
-                    if(game->powerUpEatWallTime % 2 == 0){
+                for (int j = 0; j < game->map->width; j++)
+                {
+                    // let the walls blink if the eat wall powerup is active
+                    if(game->powerUpEatWallTime <= 0){
                         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
                     }else{
-                        SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
+                        if(game->powerUpEatWallTime % 2 == 0){
+                            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                        }else{
+                            SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
+                        }
+                    }
+                    if (game->map->fields[(k * game->map->width) + j] == 0)
+                    {
+                        SDL_Rect wall = {fieldWidth * j + offset, fieldHeight * k, fieldWidth, fieldHeight};
+                        SDL_RenderFillRect(renderer, &wall);
                     }
                 }
-                if (game->map->fields[(k * game->map->width) + j] == 0)
+            }
+
+            if (game->pauseTimeout != 0) game->pauseTimeout--;
+
+            struct PowerUp *powerUp = game->powerUp;
+            while(powerUp)
+            {
+                switch (powerUp->type)
                 {
-                    SDL_Rect wall = {fieldWidth * j + offset, fieldHeight * k, fieldWidth, fieldHeight};
-                    SDL_RenderFillRect(renderer, &wall);
+                    case EAT_GHOSTS:
+                        renderTexture(eatEnemyTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight, 0, 0);
+                        break;
+                    case SLOWER:
+                        renderTexture(speedDownTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight, 0, 0);
+                        break;
+                    case FASTER:
+                        renderTexture(speedUpTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight, 0, 0);
+                        break;
+                    case GHOSTS_TO_CENTER:
+                        renderTexture(homeTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight, 0, 0);
+                        break;
+                    case TURNAROUND:
+                        renderTexture(turnTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight, 0, 0);
+                        break;
+                    case EAT_WALL:
+                        renderTexture(eatWallTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight, 0, 0);
+                        break;
+                    case GROW:
+                        renderTexture(pointTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight, 0, 0);
+                        break;
+                    default:
+                        setPowerUpSDLRenderColor(renderer, powerUp);
+                        SDL_Rect powerUpRect = {powerUp->pos.y * fieldWidth + offset, powerUp->pos.x*fieldHeight, fieldWidth, fieldHeight};
+                        SDL_RenderFillRect(renderer, &powerUpRect);
+                        break;
+
                 }
+                powerUp = powerUp->next;
             }
-        }
 
-        if (game->pauseTimeout != 0) game->pauseTimeout--;
-
-        struct PowerUp *powerUp = game->powerUp;
-        while(powerUp)
-        {
-            switch (powerUp->type)
+            struct Ghost *ghost = game->ghost;
+            while(ghost)
             {
-                case EAT_GHOSTS:
-                    renderTexture(eatEnemyTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight);
-                    break;
-                case SLOWER:
-                    renderTexture(speedDownTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight);
-                    break;
-                case FASTER:
-                    renderTexture(speedUpTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight);
-                    break;
-                case GHOSTS_TO_CENTER:
-                    renderTexture(homeTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight);
-                    break;
-                case TURNAROUND:
-                    renderTexture(turnTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight);
-                    break;
-                case EAT_WALL:
-                    renderTexture(eatWallTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight);
-                    break;
-                case GROW:
-                    renderTexture(pointTexture, powerUp->pos.y * fieldWidth + offset, powerUp->pos.x * fieldHeight);
-                    break;
-                default:
-                    setPowerUpSDLRenderColor(renderer, powerUp);
-                    SDL_Rect powerUpRect = {powerUp->pos.y * fieldWidth + offset, powerUp->pos.x*fieldHeight, fieldWidth, fieldHeight};
-                    SDL_RenderFillRect(renderer, &powerUpRect);
-                    break;
-
+                renderTexture(ghostTexture, ghost->pos.y * fieldWidth + offset, ghost->pos.x * fieldHeight, 0, 0);
+                ghost = ghost->next;
             }
-            powerUp = powerUp->next;
-        }
 
-        struct Ghost *ghost = game->ghost;
-        while(ghost)
-        {
-            renderTexture(ghostTexture, ghost->pos.y * fieldWidth + offset, ghost->pos.x * fieldHeight);
-            ghost = ghost->next;
-        }
+            SDL_SetRenderDrawColor(renderer, 255, 110, 110, 255);
+            SDL_Rect snek = {game->player->head.y * fieldWidth + offset, game->player->head.x * fieldHeight, fieldWidth, fieldHeight};
+            SDL_RenderFillRect(renderer, &snek);
 
-        SDL_SetRenderDrawColor(renderer, 255, 110, 110, 255);
-        SDL_Rect snek = {game->player->head.y * fieldWidth + offset, game->player->head.x * fieldHeight, fieldWidth, fieldHeight};
-        SDL_RenderFillRect(renderer, &snek);
-
-        struct Tail *tail = game->player->tail;
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        score = 0;
-        while(tail)
-        {
-            SDL_Rect schwanz = {tail->pos.y * fieldWidth + offset, tail->pos.x*fieldHeight, fieldWidth, fieldHeight};
-            SDL_RenderFillRect(renderer, &schwanz);
-            tail = tail->tail;
-            score++;
-        }
-
-        char *scoreText =(char*) malloc(13 * sizeof(char));;
-        sprintf(scoreText, "%s %d", "Score: ", score);
-        renderText(scoreText, 0, 0, white, 0, (width / 30));
-
-        if (!game->alive)
-        {
-            renderMenu();
-        }else if (game->pause){
-            darkenBackground();
-            renderText("GAME PAUSED", 0, 0, white, 1, 0);
-        }else{
-            printf("I: %d\nSPEED: %d\n\n", i, game->speed);
-            if (i == game->speed)
+            struct Tail *tail = game->player->tail;
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            score = 0;
+            while(tail)
             {
-                i = 0;
-                movePlayer(game->player, game);
-                moveGhosts(game->ghost, game);
-                updateTimedPowerUps(game);
+                SDL_Rect schwanz = {tail->pos.y * fieldWidth + offset, tail->pos.x*fieldHeight, fieldWidth, fieldHeight};
+                SDL_RenderFillRect(renderer, &schwanz);
+                tail = tail->tail;
+                score++;
             }
-            i++;
-        }
 
+            char *scoreText =(char*) malloc(20 * sizeof(char));;
+            sprintf(scoreText, "%s %d", "Score: ", score);
+            renderText(scoreText, 0, 0, white, 0, (width / 30));
+
+            int moveDown = 0;
+            if (game->powerUpSlowerTime != 0) 
+            {
+                char *slowerText =(char*) malloc(20 * sizeof(char));;
+                sprintf(slowerText, "%s %d", "Slow Movement:", game->powerUpSlowerTime);
+                renderText(slowerText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 40));
+                moveDown++;
+            }
+            if (game->powerUpFasterTime != 0) 
+            {
+                char *fasterText =(char*) malloc(20 * sizeof(char));;
+                sprintf(fasterText, "%s %d", "Fast Movement:", game->powerUpFasterTime);
+                renderText(fasterText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 40));
+                moveDown++;
+            }
+            if (game->powerUpEatGhostsTime != 0) 
+            {
+                char *eatGhostText =(char*) malloc(20 * sizeof(char));;
+                sprintf(eatGhostText, "%s %d", "Eat Ghosts:", game->powerUpEatGhostsTime);
+                renderText(eatGhostText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 40));
+                moveDown++;
+            }
+            if (game->powerUpEatWallTime != 0) 
+            {
+                char *eatWallText =(char*) malloc(20 * sizeof(char));;
+                sprintf(eatWallText, "%s %d", "Eat Walls:", game->powerUpEatWallTime);
+                renderText(eatWallText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 40));
+                moveDown++;
+            }
+
+            if (!game->alive)
+            {
+                renderMenu();
+            }else if (game->pause){
+                darkenBackground();
+                renderText("GAME PAUSED", 0, 0, white, 1, 0);
+            }else{
+                if (i == game->speed)
+                {
+                    i = 0;
+                    movePlayer(game->player, game);
+                    moveGhosts(game->ghost, game);
+                    updateTimedPowerUps(game);
+                }
+                i++;
+            }
+        }
         SDL_RenderPresent(renderer);
     }
     TTF_CloseFont(font);
