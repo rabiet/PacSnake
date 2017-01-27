@@ -14,5 +14,6 @@ enum Direction {
 };
 
 int comparePositions(struct Position *pos, struct Position *pos2);
+enum Direction reverseDirection(enum Direction dir);
 
 #endif

@@ -12,6 +12,7 @@ int isPlayerPos(struct Player *player, struct Position pos);
 void movePlayer(struct Player *player, struct GameState *game);
 
 void turnPlayer(struct Player *player, enum Direction direction);
+void turnPlayerAround(struct Player *player);
 
 void addTail(struct Player *player, struct Tail *newTail);
 void growTail(struct Player *player);

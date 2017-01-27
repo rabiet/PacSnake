@@ -13,6 +13,7 @@ struct Player {
 struct Tail {
   struct Position pos;
   struct Tail *tail;
+  enum Direction direction;
 };
 
 #endif

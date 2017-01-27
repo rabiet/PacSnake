@@ -43,32 +43,6 @@ struct GameState *resetGame(struct GameState *state){
     }
     score = 0;
 
-    // create the ghosts
-/*    struct Ghost *ghost = malloc(sizeof(struct Ghost));
-    struct Ghost *ghost2 = malloc(sizeof(struct Ghost));
-    struct Ghost *ghost3 = malloc(sizeof(struct Ghost));
-
-    ghost->pos.x = 14;
-    ghost->pos.y = 15;
-    ghost->direction = UP;
-    ghost->homePos.x = 14;
-    ghost->homePos.y = 15;
-    ghost->next = ghost2;
-
-    ghost2->pos.x = 14;
-    ghost2->pos.y = 12;
-    ghost2->direction = DOWN;
-    ghost2->homePos.x = 14;
-    ghost2->homePos.y = 12;
-    ghost2->next = ghost3;
-
-    ghost3->pos.x = 15;
-    ghost3->pos.y = 13;
-    ghost3->direction = LEFT;
-    ghost3->homePos.x = 14;
-    ghost3->homePos.y = 12;
-    ghost3->next = NULL;
-*/
     // free old map
     if(state && state->map){
         free(state->map);
@@ -97,8 +71,6 @@ struct GameState *resetGame(struct GameState *state){
         return NULL;
     }
 
-    // create player
-
     // create gamestate
     state->powerUp = NULL;
     state->alive = false;
@@ -110,6 +82,7 @@ struct GameState *resetGame(struct GameState *state){
     state->powerUpFasterTime = 0;
     state->powerUpEatGhostsTime = 0;
     state->powerUpEatWallTime = 0;
+
     // create init powerups
     spawnPowerup(GROW, 0, state);
     spawnPowerup(GROW, 0, state);

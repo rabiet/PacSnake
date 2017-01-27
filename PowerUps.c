@@ -88,14 +88,16 @@ void takePowerup(struct PowerUp *powerUp, struct GameState *state){
             break;
         case FASTER:
             if(state->powerUpFasterTime == 0){
-                state->speed -= 5;
+                state->speed -= 3;
             }
             state->powerUpFasterTime += powerUp->time;
             break;
         case GHOSTS_TO_CENTER:
             moveGhostsHome(state->ghost);
             break;
-        case TURNAROUND: break;
+        case TURNAROUND:
+            turnPlayerAround(state->player);
+            break;
         case EAT_WALL:
             state->powerUpEatWallTime += powerUp->time;
             break;

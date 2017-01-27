@@ -34,6 +34,7 @@ int isPlayerPos(struct Player *player, struct Position pos){
 
 void movePlayer(struct Player *player, struct GameState *game){
     struct Position oldPos = player->head;
+    enum Direction oldDir = player->direction;
 
     switch (player->direction) {
         case UP:
@@ -67,11 +68,15 @@ void movePlayer(struct Player *player, struct GameState *game){
 
     struct Tail *tail = player->tail;
     struct Position tempPos;
+    enum Direction tempDir;
 
     while(tail){
         tempPos = tail->pos;
+        tempDir = tail->direction;
         tail->pos = oldPos;
+        tail->direction = oldDir;
         oldPos = tempPos;
+        oldDir = tempDir;
         tail = tail->tail;
     }
 
@@ -112,6 +117,7 @@ void growTail(struct Player *player){
 
     if(!player->tail) {
         tail->pos = player->head;
+        tail->direction = player->direction;
         player->tail = tail;
     } else {
         struct Tail *lastTail = player->tail;
@@ -121,6 +127,7 @@ void growTail(struct Player *player){
         }
 
         tail->pos = lastTail->pos;
+        tail->direction = lastTail->direction;
         lastTail->tail = tail;
     }
 }
@@ -144,4 +151,37 @@ void removeTails(struct Tail *tail){
         tail = t->tail;
         free(t);
     }
+}
+
+void turnPlayerAround(struct Player *player){
+    if(!player->tail){
+        player->direction = reverseDirection(player->direction);
+        return;
+    }
+
+    struct Tail *first = player->tail;
+    struct Tail *tail = player->tail;
+    struct Tail *last = NULL;
+    struct Tail *temp = NULL;
+
+    while (tail) {
+        temp = tail;
+        tail = tail->tail;
+        temp->tail = last;
+        last = temp;
+        last->direction = reverseDirection(last->direction);
+    }
+
+    struct Position pPos = player->head;
+    enum Direction pDir = reverseDirection(player->direction);
+    struct Position lPos = last->pos;
+    enum Direction lDir = last->direction;
+
+    player->head = lPos;
+    player->direction = lDir;
+    player->tail = last->tail;
+    last->pos = pPos;
+    last->direction = pDir;
+    last->tail = NULL;
+    first->tail = last;
 }
