@@ -44,7 +44,7 @@ struct GameState *resetGame(struct GameState *state){
     score = 0;
 
     // create the ghosts
-    struct Ghost *ghost = malloc(sizeof(struct Ghost));
+/*    struct Ghost *ghost = malloc(sizeof(struct Ghost));
     struct Ghost *ghost2 = malloc(sizeof(struct Ghost));
     struct Ghost *ghost3 = malloc(sizeof(struct Ghost));
 
@@ -68,17 +68,11 @@ struct GameState *resetGame(struct GameState *state){
     ghost3->homePos.x = 14;
     ghost3->homePos.y = 12;
     ghost3->next = NULL;
-
+*/
     // free old map
     if(state && state->map){
         free(state->map);
         state->map = NULL;
-    }
-
-    struct Map *map = loadMap();
-    if(map == NULL){
-        printf("Coudn't load map...\n");
-        return NULL;
     }
 
     // free old player
@@ -90,37 +84,22 @@ struct GameState *resetGame(struct GameState *state){
         state->player = NULL;
     }
 
-    // create player
-    struct Player *player = malloc(sizeof(struct Player));
-    struct Tail *tail1 = malloc(sizeof(struct Tail));
-    struct Tail *tail2 = malloc(sizeof(struct Tail));
-    struct Tail *tail3 = malloc(sizeof(struct Tail));
-
-    player->head.x = 1;
-    player->head.y = 2;
-    player->direction = RIGHT;
-    player->tail = tail1;
-
-    tail1->tail = tail2;
-    tail1->pos.x = 1;
-    tail1->pos.y = 1;
-
-    tail2->tail = tail3;
-    tail2->pos.x = 2;
-    tail2->pos.y = 1;
-
-    tail3->tail = NULL;
-    tail3->pos.x = 3;
-    tail3->pos.y = 1;
-
     if(!state){
         state = malloc(sizeof(struct GameState));
+        state->ghost = NULL;
+        state->player = NULL;
+        state->map = NULL;
     }
 
+    int success = loadMap(state);
+    if(!success){
+        printf("Coudn't load map...\n");
+        return NULL;
+    }
+
+    // create player
+
     // create gamestate
-    state->map = map;
-    state->ghost = ghost;
-    state->player = player;
     state->powerUp = NULL;
     state->alive = false;
     state->running = true;

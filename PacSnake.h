@@ -2,7 +2,7 @@
 #define _pacsnake_h
 
 #include "Position.h"
-#include "Map.h"
+#include "Map_structs.h"
 #include "Ghosts_structs.h"
 #include "Player_structs.h"
 #include <stdbool.h>

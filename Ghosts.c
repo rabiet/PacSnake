@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "Ghosts.h"
 #include "Player.h"
+#include "Map.h"
 
 void moveGhost(struct Ghost *ghost, struct GameState *game) {
     struct Position up = {ghost->pos.x-1, ghost->pos.y};

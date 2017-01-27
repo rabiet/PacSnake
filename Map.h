@@ -1,19 +1,17 @@
 #ifndef _map_h
 #define _map_h
+
+#include "Map_structs.h"
 #include "Position.h"
+#include "PacSnake.h"
 
 enum MapFieldTypes {
     WALL,
     FREE
 };
 
-struct Map {
-    int width;
-    int length;
-    enum MapFieldTypes *fields;
-};
 
-struct Map *loadMap();
+int loadMap(struct GameState *state);
 
 void printMapToConsole(struct Map *map);
 

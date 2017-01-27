@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "Map.h"
+#include "PacSnake.h"
 
 /*
  * prints the map to the console (it does not look nice ;) )
@@ -17,14 +18,14 @@ void printMapToConsole(struct Map *map) {
 /*
  * loads the map from the file and returns it as a pointer to a struct Map
  */
-struct Map* loadMap() {
+int loadMap(struct GameState *state) {
     FILE *mapFile;
 
     mapFile = fopen("map.txt", "r");
 
     if (!mapFile) {
         printf("Error while reading file map.txt\n");
-        return NULL;
+        return 0;
     }
 
 
@@ -81,6 +82,54 @@ struct Map* loadMap() {
             case '#':
                 map[row * width + col] = WALL;
                 break;
+            case 'G':
+                if(true){
+                    struct Ghost *ghost = malloc(sizeof(struct Ghost));
+                    ghost->pos.x = row;
+                    ghost->pos.y = col;
+                    ghost->direction = UP;
+                    ghost->homePos.x = row;
+                    ghost->homePos.y = col;
+                    ghost->next = NULL;
+
+                    if(state->ghost){
+                        struct Ghost *tempGhost = state->ghost;
+
+                        while(tempGhost->next){
+                            tempGhost = tempGhost->next;
+                        }
+
+                        tempGhost->next = ghost;
+                    }else{
+                        state->ghost = ghost;
+                    }
+                }
+            case 'P':
+                if(!state->player){
+                    struct Player *player = malloc(sizeof(struct Player));
+                    struct Tail *tail1 = malloc(sizeof(struct Tail));
+                    struct Tail *tail2 = malloc(sizeof(struct Tail));
+                    struct Tail *tail3 = malloc(sizeof(struct Tail));
+
+                    player->head.x = row;
+                    player->head.y = col;
+                    player->direction = RIGHT;
+                    player->tail = tail1;
+
+                    tail1->tail = tail2;
+                    tail1->pos.x = row;
+                    tail1->pos.y = col;
+
+                    tail2->tail = tail3;
+                    tail2->pos.x = row;
+                    tail2->pos.y = col;
+
+                    tail3->tail = NULL;
+                    tail3->pos.x = row;
+                    tail3->pos.y = col;
+
+                    state->player = player;
+                }
             default:
                 map[row * width + col] = FREE;
                 break;
@@ -95,7 +144,9 @@ struct Map* loadMap() {
     mapstruc->length = length;
     mapstruc->fields = map;
 
-    return mapstruc;
+    state->map = mapstruc;
+
+    return 1;
 }
 
 /*
