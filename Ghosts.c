@@ -71,26 +71,31 @@ void moveGhost(struct Ghost *ghost, struct GameState *game) {
             break;
     }
 
+    if(!game->powerUpEatGhostsTime){
+        if(comparePositions(&game->player->head, &ghost->pos)){
+            game->alive = false;
+        }else if(game->player->tail && comparePositions(&game->player->tail->pos, &ghost->pos)){
+            removeTails(game->player->tail);
+            game->player->tail = NULL;
+        }else{
+            struct Tail *tail = game->player->tail;
+            struct Tail *oldtail = game->player->tail;
 
-    if(comparePositions(&game->player->head, &ghost->pos)){
-        game->alive = false;
-        return;
-    }else if(game->player->tail && comparePositions(&game->player->tail->pos, &ghost->pos)){
-        removeTails(game->player->tail);
-    }else{
-        struct Tail *tail = game->player->tail;
-        struct Tail *oldtail = game->player->tail;
-
-        while(tail && !comparePositions(&tail->pos, &ghost->pos)) {
-            oldtail = tail;
-            tail = tail->tail;
-        }
-
-        if(tail){
-            removeTails(tail);
-            if(oldtail){
-                oldtail->tail = NULL;
+            while(tail && !comparePositions(&tail->pos, &ghost->pos)) {
+                oldtail = tail;
+                tail = tail->tail;
             }
+
+            if(tail){
+                removeTails(tail);
+                if(oldtail){
+                    oldtail->tail = NULL;
+                }
+            }
+        }
+    }else{
+        if(isPlayerPos(game->player, ghost->pos)){
+            moveGhostHome(ghost);
         }
     }
 }

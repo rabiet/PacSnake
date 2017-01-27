@@ -79,17 +79,6 @@ void movePlayer(struct Player *player, struct GameState *game){
         removeWall(game->map, player->head);
     }
 
-    if(game->powerUpEatGhostsTime > 0){
-        struct Ghost *ghost = game->ghost;
-        while(ghost->next){
-            if(isPlayerPos(game->player, ghost->pos)){
-                moveGhostHome(ghost);
-            }
-            ghost = ghost->next;
-        }
-    }
-
-
     if(isWall(game->map, player->head) || isTailPos(game->player->tail, player->head)){
         game->alive = false;
     }
@@ -97,32 +86,12 @@ void movePlayer(struct Player *player, struct GameState *game){
     takePowerupPos(player->head, game);
 
     struct Ghost *ghost = game->ghost;
-        while(ghost)
-        {
-            if(comparePositions(&game->player->head, &ghost->pos))
-            {
-                game->alive = false;
-                return;
-            }else if(game->player->tail && comparePositions(&game->player->tail->pos, &ghost->pos)){
-                removeTails(game->player->tail);
-            }else{
-                struct Tail *tail = game->player->tail;
-                struct Tail *oldtail = game->player->tail;
-
-                while(tail && !comparePositions(&tail->pos, &ghost->pos)) 
-                {
-                    oldtail = tail;
-                    tail = tail->tail;
-                }
-
-                if(tail)
-                {
-                    removeTails(tail);
-                    if(oldtail) oldtail->tail = NULL;
-                }
-            }
-            ghost = ghost->next;
+    while(ghost){
+        if(comparePositions(&game->player->head, &ghost->pos)) {
+            game->alive = false;
         }
+        ghost = ghost->next;
+    }
 }
 
 void addTail(struct Player *player, struct Tail *newTail){

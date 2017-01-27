@@ -262,7 +262,7 @@ int main(int argc, char **argv) {
     imageLoader = SDL_LoadBMP("speedUp.bmp");;
     speedUpTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
     SDL_FreeSurface(imageLoader);
-    
+
     imageLoader = SDL_LoadBMP("speedDown.bmp");;
     speedDownTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
     SDL_FreeSurface(imageLoader);
@@ -328,7 +328,7 @@ int main(int argc, char **argv) {
             renderText("Lets you eat walls... for a while", fieldHeight * 10, fieldHeight * 23, white, 0, width / 30);
             renderTexture(pointTexture, fieldHeight * 6, fieldWidth * 26, fieldHeight * 3, fieldWidth * 3);
             renderText("Enlarges you and raises your score", fieldHeight * 10, fieldHeight * 27, white, 0, width / 30);
-            
+
             renderText("Back", fieldHeight, fieldHeight, red, 0, width / 25);
         }else{
             for (int k = 0; k < game->map->length; k++)
@@ -341,6 +341,8 @@ int main(int argc, char **argv) {
                     }else{
                         if(game->powerUpEatWallTime % 2 == 0){
                             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                        }else if(game->powerUpEatWallTime < 6){
+                            SDL_SetRenderDrawColor(renderer, 150, 0, 0, 255);
                         }else{
                             SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
                         }
@@ -418,28 +420,28 @@ int main(int argc, char **argv) {
             renderText(scoreText, 0, 0, white, 0, (width / 30));
 
             int moveDown = 0;
-            if (game->powerUpSlowerTime != 0) 
+            if (game->powerUpSlowerTime != 0)
             {
                 char *slowerText =(char*) malloc(20 * sizeof(char));;
                 sprintf(slowerText, "%s %d", "Slow Movement:", game->powerUpSlowerTime);
                 renderText(slowerText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 40));
                 moveDown++;
             }
-            if (game->powerUpFasterTime != 0) 
+            if (game->powerUpFasterTime != 0)
             {
                 char *fasterText =(char*) malloc(20 * sizeof(char));;
                 sprintf(fasterText, "%s %d", "Fast Movement:", game->powerUpFasterTime);
                 renderText(fasterText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 40));
                 moveDown++;
             }
-            if (game->powerUpEatGhostsTime != 0) 
+            if (game->powerUpEatGhostsTime != 0)
             {
                 char *eatGhostText =(char*) malloc(20 * sizeof(char));;
                 sprintf(eatGhostText, "%s %d", "Eat Ghosts:", game->powerUpEatGhostsTime);
                 renderText(eatGhostText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 40));
                 moveDown++;
             }
-            if (game->powerUpEatWallTime != 0) 
+            if (game->powerUpEatWallTime != 0)
             {
                 char *eatWallText =(char*) malloc(20 * sizeof(char));;
                 sprintf(eatWallText, "%s %d", "Eat Walls:", game->powerUpEatWallTime);
