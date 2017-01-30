@@ -25,4 +25,16 @@ struct GameState {
     int maxScore;
 };
 
+struct GameState *resetGame(struct GameState *state);
+
+int height;
+int width;
+int fieldHeight;
+int fieldWidth;
+char *name;
+
+char oldHS[1024];
+
+struct SDL_Renderer *renderer;
+
 #endif

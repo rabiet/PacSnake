@@ -9,10 +9,10 @@ LDFLAGS=-L".\SDL2\x86_64-w64-mingw32\lib" -lmingw32 -lSDL2main -lSDL2_ttf -lSDL2
 all: run
 
 PacSnake.exe:
-	$(CC) $(CFLAGS) -o PacSnake.exe PacSnake.c Ghosts.c Player.c PowerUps.c Map.c Position.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -o PacSnake.exe PacSnake.c Ghosts.c Player.c PowerUps.c Map.c Position.c Highscore.c Rendering.c $(LDFLAGS)
 
 build:
-	$(CC) $(CFLAGS) -o PacSnake.exe PacSnake.c Ghosts.c Player.c PowerUps.c Map.c Position.c $(LDFLAGS)
+	$(CC) $(CFLAGS) -o PacSnake.exe PacSnake.c Ghosts.c Player.c PowerUps.c Map.c Position.c Highscore.c Rendering.c $(LDFLAGS)
 
 run: PacSnake.exe
 	PacSnake.exe
