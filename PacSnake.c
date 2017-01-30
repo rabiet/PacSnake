@@ -23,6 +23,10 @@ int fieldHeight;
 int fieldWidth;
 int offset;
 bool symbols;
+bool saved;
+char *name;
+char *composition;
+char oldHS[1024];
 SDL_Rect kasten;
 
 SDL_Color white = {255, 255, 255, 255};
@@ -32,6 +36,7 @@ TTF_Font *font;
 
 struct GameState *resetGame(struct GameState *state){
     // free old ghosts
+    saved = false;
     if(state && state->ghost){
         struct Ghost *g = state->ghost;
         while(g){
@@ -102,6 +107,112 @@ void renderTexture(SDL_Texture *texture, int x, int y, int h, int w)
     SDL_RenderCopy(renderer, texture, NULL, &helperRect);
 }
 
+void renderText(const char *text, int x, int y, SDL_Color color, int center, int size)
+{
+    if (size == 0) size = (width / 10);
+    font = TTF_OpenFont("consola.ttf", size);
+    SDL_Surface *pauseText = TTF_RenderText_Blended(font, text, color);
+    SDL_Texture* textT = SDL_CreateTextureFromSurface(renderer, pauseText);
+    SDL_FreeSurface(pauseText);
+    SDL_Rect rect;
+    SDL_QueryTexture(textT, NULL, NULL, &rect.w, &rect.h);
+    switch (center)
+    {
+        case 0: rect.x = x; rect.y = y; break;                                              // Not centered, use x and y
+        case 1: rect.y = height / 2 - rect.h / 2; rect.x = width / 2 - rect.w / 2; break;   // Centered in right in the middle of the screen
+        case 2: rect.x = width / 2 - rect.w / 2; rect.y = y; break;                         // Centered horizontally
+        case 3: rect.x = width / 5; rect.y = y; break;
+        case 4: rect.x = width - width / 5 - rect.w; rect.y = y; break;
+    }
+    SDL_RenderCopy(renderer, textT, NULL, &rect);
+    SDL_DestroyTexture(textT);
+}
+
+void darkenBackground(bool black)
+{
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, black ? 255 : 225);
+    SDL_Rect background = {0, 0, width, height};
+    SDL_RenderFillRect(renderer, &background);
+}
+
+void writeHS(struct GameState *state)
+{
+    FILE *f = fopen("highscores.db", "w");
+    if (f == NULL)
+    {
+        return;
+    }
+    fprintf(f, "%s;%s|%d", oldHS, name, state->score);
+    fclose(f);
+    saved = true;
+}
+
+char * loadHS()
+{
+    char leaderBoard[1024];
+    FILE *fptr;
+
+    if ((fptr = fopen("highscores.db", "r")) == NULL){
+       return "";
+   }
+
+   fscanf(fptr, "%s", &leaderBoard);
+   fclose(fptr);
+   return leaderBoard;
+}
+
+void drawHS()
+{
+    darkenBackground(true);
+    char string[1024];
+    strcpy(string, oldHS);
+    char delimiter[] = "|;";
+    char *ptr;
+    ptr = strtok(string, delimiter);
+    renderText("Highscores", 0, fieldHeight, white, 2, width / 10);
+    int which = 0;
+    while(ptr != NULL) 
+    {
+        renderText(ptr, 0, (height / 4) + ((which / 2) * (width / 20)), white, (which % 2) == 0 ? 3 : 4, width / 30);
+        which++;
+     	ptr = strtok(NULL, delimiter);
+        if (which == 16) ptr = NULL;
+    }
+
+}
+
+char * getName(struct GameState *state)
+{
+    bool done = false;
+    char nam[64] = "";
+    SDL_StartTextInput();
+    while (!done) {
+        SDL_Event event;
+        if (SDL_PollEvent(&event)) {
+            if (event.key.keysym.sym == SDLK_RETURN && state->pauseTimeout == 0) { done = true; }
+            switch (event.type) {
+                case SDL_QUIT:
+                    done = true;
+                    break;
+                case SDL_TEXTINPUT:
+                    strcat(nam, event.text.text);
+                    break;
+                case SDL_TEXTEDITING:
+                    composition = event.edit.text;
+                    break;
+            }
+        }
+        if (state->pauseTimeout != 0) state->pauseTimeout--;
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        renderText("Name:", 0, height / 2 - (width / 7), white, 2, width / 10);
+        renderText(nam, 0, 0, white, 1, width / 15);
+        SDL_RenderPresent(renderer);
+    }
+    return nam;
+}
+
 void handleReturn(struct GameState *state)
 {
     if (state->alive == 0 && state->pauseTimeout == 0)
@@ -109,14 +220,17 @@ void handleReturn(struct GameState *state)
         switch (selected)
         {
             case 0:
+                state->pauseTimeout = 30;
+                name = getName(state);
                 state = resetGame(state);
                 state->alive = 1;
                 break;
             case 1:
-                symbols = true;
+                state->alive = -2;
                 break;
             case 2:
-                printf("Not implemented");
+                strcpy(oldHS, loadHS());
+                state->alive = -1;
                 break;
             case 3:
                 state->running = false;
@@ -132,33 +246,6 @@ void handleReturn(struct GameState *state)
             printf("Game (un/)paused!\n");
         }
     }
-}
-
-void renderText(const char *text, int x, int y, SDL_Color color, int center, int size)
-{
-    if (size == 0) size = (width / 10);
-    font = TTF_OpenFont("consola.ttf", size);
-    SDL_Surface *pauseText = TTF_RenderText_Solid(font, text, color);
-    SDL_Texture* textT = SDL_CreateTextureFromSurface(renderer, pauseText);
-    SDL_FreeSurface(pauseText);
-    SDL_Rect rect;
-    SDL_QueryTexture(textT, NULL, NULL, &rect.w, &rect.h);
-    switch (center)
-    {
-        case 0: rect.x = x; rect.y = y; break;                                              // Not centered, use x and y
-        case 1: rect.y = height / 2 - rect.h / 2; rect.x = width / 2 - rect.w / 2; break;   // Centered in right in the middle of the screen
-        case 2: rect.x = width / 2 - rect.w / 2; rect.y = y; break;                         // Centered horizontally
-    }
-    SDL_RenderCopy(renderer, textT, NULL, &rect);
-    SDL_DestroyTexture(textT);
-}
-
-void darkenBackground(bool black)
-{
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, black ? 255 : 225);
-    SDL_Rect background = {0, 0, width, height};
-    SDL_RenderFillRect(renderer, &background);
 }
 
 void renderMenu()
@@ -217,7 +304,8 @@ int main(int argc, char **argv) {
     SDL_Texture *turnTexture;
     SDL_Texture *eatWallTexture;
     SDL_Texture *pointTexture;
-
+    
+    strcpy(oldHS, loadHS());
 
     SDL_Surface *imageLoader = SDL_LoadBMP("ghost.bmp");;
     ghostTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
@@ -272,7 +360,7 @@ int main(int argc, char **argv) {
                 case (SDLK_a): turnPlayer(game->player, LEFT); break;
                 case (SDLK_RIGHT):
                 case (SDLK_d): turnPlayer(game->player, RIGHT); break;
-                case (SDLK_BACKSPACE): symbols = false; break;
+                case (SDLK_BACKSPACE): game->alive = 0; break;
                 case (SDLK_ESCAPE): game->running = false; break;
                 case (SDLK_RETURN): handleReturn(game); break;
             }
@@ -280,7 +368,7 @@ int main(int argc, char **argv) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
         SDL_RenderClear(renderer);
 
-        if (symbols)
+        if (game->alive == -2)
         {
             renderTexture(homeTexture, fieldHeight * 6, fieldWidth * 2, fieldHeight * 3, fieldWidth * 3);
             renderText("Sends all ghosts home", fieldHeight * 10, fieldHeight * 3, white, 0, width / 30);
@@ -298,6 +386,17 @@ int main(int argc, char **argv) {
             renderText("Enlarges you and raises your score", fieldHeight * 10, fieldHeight * 27, white, 0, width / 30);
 
             renderText("Back", fieldHeight, fieldHeight, red, 0, width / 25);
+        }else if (game->alive > 1){
+            darkenBackground(true);
+            writeHS(game);
+            renderText("You died!", 0, height / 2 - (height / 5), red, 2, width / 7);
+            renderText((game->alive == 2) ? "You ran into a wall!" : "Eaten by a ghost!", 0, height / 2, white, 2, width / 20);
+            char *scoreText =(char*) malloc(20 * sizeof(char));;
+            sprintf(scoreText, "%s %d", "Score:", game->maxScore);
+            renderText(scoreText, 0, height / 2 + (height / 5), white, 2, width / 20);
+            free(scoreText);
+        }else if (game->alive == -1){
+            drawHS();
         }else{
             for (int k = 0; k < game->map->length; k++)
             {
@@ -402,42 +501,34 @@ int main(int argc, char **argv) {
             {
                 char *slowerText =(char*) malloc(20 * sizeof(char));;
                 sprintf(slowerText, "%s %d", "Slow Movement:", game->powerUpSlowerTime);
-                renderText(slowerText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 70));
+                renderText(slowerText, offset + (fieldWidth * game->map->width), moveDown * (width / 70) + 5, white, 0, (width / 70));
                 moveDown++;
             }
             if (game->powerUpFasterTime != 0)
             {
                 char *fasterText =(char*) malloc(20 * sizeof(char));;
                 sprintf(fasterText, "%s %d", "Fast Movement:", game->powerUpFasterTime);
-                renderText(fasterText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 70));
+                renderText(fasterText, offset + (fieldWidth * game->map->width), moveDown * (width / 70) + 5, white, 0, (width / 70));
                 moveDown++;
             }
             if (game->powerUpEatGhostsTime != 0)
             {
                 char *eatGhostText =(char*) malloc(20 * sizeof(char));;
                 sprintf(eatGhostText, "%s %d", "Eat Ghosts:", game->powerUpEatGhostsTime);
-                renderText(eatGhostText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 70));
+                renderText(eatGhostText, offset + (fieldWidth * game->map->width), moveDown * (width /70) + 5, white, 0, (width / 70));
                 moveDown++;
             }
             if (game->powerUpEatWallTime != 0)
             {
                 char *eatWallText =(char*) malloc(20 * sizeof(char));;
                 sprintf(eatWallText, "%s %d", "Eat Walls:", game->powerUpEatWallTime);
-                renderText(eatWallText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 70));
+                renderText(eatWallText, offset + (fieldWidth * game->map->width), moveDown * (width / 70) + 5, white, 0, (width / 70));
                 moveDown++;
             }
 
             if (game->alive == 0)
             {
                 renderMenu();
-            }else if (game->alive > 1){
-                darkenBackground(true);
-                renderText("You died!", 0, height / 2 - (height / 5), red, 2, width / 7);
-                renderText((game->alive == 2) ? "You ran into a wall!" : "Eaten by a ghost!", 0, height / 2, white, 2, width / 20);
-                char *scoreText =(char*) malloc(20 * sizeof(char));;
-                sprintf(scoreText, "%s %d", "Score:", game->score);
-                renderText(scoreText, 0, height / 2 + (height / 5), white, 2, width / 20);
-                free(scoreText);
             }
             else if (game->pause){
                 darkenBackground(true);
