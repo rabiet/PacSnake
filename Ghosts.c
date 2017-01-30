@@ -74,7 +74,7 @@ void moveGhost(struct Ghost *ghost, struct GameState *game) {
 
     if(!game->powerUpEatGhostsTime){
         if(comparePositions(&game->player->head, &ghost->pos)){
-            game->alive = false;
+            game->alive = 3;
         }else if(game->player->tail && comparePositions(&game->player->tail->pos, &ghost->pos)){
             removeTails(game->player->tail);
             game->player->tail = NULL;

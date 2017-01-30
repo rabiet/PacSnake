@@ -85,7 +85,7 @@ void movePlayer(struct Player *player, struct GameState *game){
     }
 
     if(isWall(game->map, player->head) || isTailPos(game->player->tail, player->head)){
-        game->alive = false;
+        game->alive = 2;
     }
 
     takePowerupPos(player->head, game);
@@ -93,7 +93,7 @@ void movePlayer(struct Player *player, struct GameState *game){
     struct Ghost *ghost = game->ghost;
     while(ghost){
         if(comparePositions(&game->player->head, &ghost->pos)) {
-            game->alive = false;
+            game->alive = 3;
         }
         ghost = ghost->next;
     }

@@ -17,7 +17,7 @@ struct GameState {
     int powerUpFasterTime;
     int powerUpEatGhostsTime;
     int powerUpEatWallTime;
-    bool alive;
+    int alive;
     bool running;
     bool pause;
     int pauseTimeout;

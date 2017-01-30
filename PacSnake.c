@@ -24,6 +24,7 @@ int fieldWidth;
 int offset;
 int score;
 bool symbols;
+SDL_Rect kasten;
 
 SDL_Color white = {255, 255, 255, 255};
 SDL_Color red   = {255, 0, 0, 255};
@@ -68,12 +69,12 @@ struct GameState *resetGame(struct GameState *state){
     int success = loadMap(state);
     if(!success){
         printf("Coudn't load map...\n");
-        return NULL;
+        return -1;
     }
 
     // create gamestate
     state->powerUp = NULL;
-    state->alive = false;
+    state->alive = 0;
     state->running = true;
     state->pause = false;
     state->pauseTimeout = 60;
@@ -103,21 +104,26 @@ void renderTexture(SDL_Texture *texture, int x, int y, int h, int w)
 
 void handleReturn(struct GameState *state)
 {
-    if (!state->alive)
+    if (state->alive == 0 && state->pauseTimeout == 0)
     {
         switch (selected)
         {
             case 0:
                 state = resetGame(state);
-                state->alive = true;
+                state->alive = 1;
                 break;
             case 1:
                 symbols = true;
                 break;
             case 2:
+                printf("Not implemented");
+                break;
+            case 3:
                 state->running = false;
                 break;
         }
+    }else if (state->alive > 1){
+        if (state->pauseTimeout == 0) { state->alive = 0; state->pauseTimeout = 30; }
     }else{
         if (state->pauseTimeout == 0)
         {
@@ -147,20 +153,24 @@ void renderText(const char *text, int x, int y, SDL_Color color, int center, int
     SDL_DestroyTexture(textT);
 }
 
-void darkenBackground()
+void darkenBackground(bool black)
 {
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 225);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, black ? 255 : 225);
     SDL_Rect background = {0, 0, width, height};
     SDL_RenderFillRect(renderer, &background);
 }
 
 void renderMenu()
 {
-    darkenBackground();
-    renderText("New Game", -1, height / 2 - (width / 8), (selected == 0) ? red : white, 2, 0);
-    renderText("Symbols", -1, height / 2, (selected == 1) ? red : white, 2, 0);
-    renderText("Exit", -1, height / 2 + (width / 8), (selected == 2) ? red : white, 2, 0);
+    darkenBackground(true);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderDrawRect(renderer, &kasten);
+    renderText("PACSNAKE", -1, fieldHeight, white, 2, height / 5);
+    renderText("New Game", -1, height / 2 - (height / 5), (selected == 0) ? red : white, 2, width / 15);
+    renderText("Symbols", -1, height / 2 - height / 15, (selected == 1) ? red : white, 2, width / 15);
+    renderText("Highscore", -1, height / 2 + height / 15, selected == 2 ? red : white, 2, width / 15);
+    renderText("Exit", -1, height / 2 + (height / 5), (selected == 3) ? red : white, 2, width / 15);
 }
 
 int main(int argc, char **argv) {
@@ -186,6 +196,11 @@ int main(int argc, char **argv) {
     fieldHeight = height / game->map->length;
     fieldWidth = fieldHeight;
     offset = (width / 2) - (fieldWidth * (game->map->width / 2));
+
+    kasten.x = (width / 4);
+    kasten.y = (height / 4);
+    kasten.h = height / 1.7;
+    kasten.w = width / 2;
 
     printf("width: %d\nheight: %d\nfieldHeight: %d\noffset: %d\nlength: %d\nwidth: %d\n", width, height, fieldHeight, offset, game->map->length, game->map->width);
 
@@ -249,9 +264,9 @@ int main(int argc, char **argv) {
             switch (event.key.keysym.sym)
             {
                 case (SDLK_UP):
-                case (SDLK_w): if (game->alive) turnPlayer(game->player, UP); else { if (selected != 0 && game->pauseTimeout == 0) selected--; game->pauseTimeout = 10; } break;
+                case (SDLK_w): if (game->alive == 1) turnPlayer(game->player, UP); else { if (selected != 0 && game->pauseTimeout == 0) selected--; game->pauseTimeout = 5; } break;
                 case (SDLK_DOWN):
-                case (SDLK_s): if (game->alive) turnPlayer(game->player, DOWN); else { if (selected != 2 && game->pauseTimeout == 0) selected++; game->pauseTimeout = 10; } break;
+                case (SDLK_s): if (game->alive == 1) turnPlayer(game->player, DOWN); else { if (selected != 3 && game->pauseTimeout == 0) selected++; game->pauseTimeout = 5; } break;
                 case (SDLK_LEFT):
                 case (SDLK_a): turnPlayer(game->player, LEFT); break;
                 case (SDLK_RIGHT):
@@ -376,36 +391,41 @@ int main(int argc, char **argv) {
             {
                 char *slowerText =(char*) malloc(20 * sizeof(char));;
                 sprintf(slowerText, "%s %d", "Slow Movement:", game->powerUpSlowerTime);
-                renderText(slowerText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 40));
+                renderText(slowerText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 70));
                 moveDown++;
             }
             if (game->powerUpFasterTime != 0)
             {
                 char *fasterText =(char*) malloc(20 * sizeof(char));;
                 sprintf(fasterText, "%s %d", "Fast Movement:", game->powerUpFasterTime);
-                renderText(fasterText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 40));
+                renderText(fasterText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 70));
                 moveDown++;
             }
             if (game->powerUpEatGhostsTime != 0)
             {
                 char *eatGhostText =(char*) malloc(20 * sizeof(char));;
                 sprintf(eatGhostText, "%s %d", "Eat Ghosts:", game->powerUpEatGhostsTime);
-                renderText(eatGhostText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 40));
+                renderText(eatGhostText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 70));
                 moveDown++;
             }
             if (game->powerUpEatWallTime != 0)
             {
                 char *eatWallText =(char*) malloc(20 * sizeof(char));;
                 sprintf(eatWallText, "%s %d", "Eat Walls:", game->powerUpEatWallTime);
-                renderText(eatWallText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 40));
+                renderText(eatWallText, offset + (fieldWidth * game->map->width), moveDown * (width / 30) + 5, white, 0, (width / 70));
                 moveDown++;
             }
 
-            if (!game->alive)
+            if (game->alive == 0)
             {
                 renderMenu();
-            }else if (game->pause){
-                darkenBackground();
+            }else if (game->alive > 1){
+                darkenBackground(true);
+                renderText("You died!", 0, height / 2 - (height / 9), red, 2, width / 7);
+                renderText((game->alive == 2) ? "You ran into a wall!" : "Eaten by a ghost!", 0, height / 2 + (height / 10), white, 2, width / 20);
+            }
+            else if (game->pause){
+                darkenBackground(true);
                 renderText("GAME PAUSED", 0, 0, white, 1, 0);
             }else{
                 if (i == game->speed)
