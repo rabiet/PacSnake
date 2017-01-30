@@ -22,7 +22,6 @@ int height;
 int fieldHeight;
 int fieldWidth;
 int offset;
-int score;
 bool symbols;
 SDL_Rect kasten;
 
@@ -42,7 +41,6 @@ struct GameState *resetGame(struct GameState *state){
         }
         state->ghost = NULL;
     }
-    score = 0;
 
     // free old map
     if(state && state->map){
@@ -69,7 +67,7 @@ struct GameState *resetGame(struct GameState *state){
     int success = loadMap(state);
     if(!success){
         printf("Coudn't load map...\n");
-        return -1;
+        return NULL;
     }
 
     // create gamestate
@@ -78,6 +76,8 @@ struct GameState *resetGame(struct GameState *state){
     state->running = true;
     state->pause = false;
     state->pauseTimeout = 60;
+    state->score = 0;
+    state->maxScore = 0;
     state->speed = 15;
     state->powerUpSlowerTime = 0;
     state->powerUpFasterTime = 0;
@@ -181,6 +181,7 @@ int main(int argc, char **argv) {
     if(!game){
         return -1;
     }
+
 
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
@@ -373,18 +374,28 @@ int main(int argc, char **argv) {
 
             struct Tail *tail = game->player->tail;
             SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-            score = 0;
+            int curscore = 0;
             while(tail)
             {
                 SDL_Rect schwanz = {tail->pos.y * fieldWidth + offset, tail->pos.x*fieldHeight, fieldWidth, fieldHeight};
                 SDL_RenderFillRect(renderer, &schwanz);
                 tail = tail->tail;
-                score++;
+                curscore++;
             }
 
+            if(curscore > game->maxScore){
+                game->maxScore = curscore;
+            }
+
+            game->score = curscore;
+
             char *scoreText =(char*) malloc(20 * sizeof(char));;
-            sprintf(scoreText, "%s %d", "Score: ", score);
+            sprintf(scoreText, "%s %d", "Length: ", game->score);
             renderText(scoreText, 0, 0, white, 0, (width / 30));
+
+            char *maxScoreText =(char*) malloc(20 * sizeof(char));;
+            sprintf(maxScoreText, "%s %d", "Score: ", game->maxScore);
+            renderText(maxScoreText, 0, (width / 30) + 5, white, 0, (width / 30));
 
             int moveDown = 0;
             if (game->powerUpSlowerTime != 0)
@@ -421,8 +432,12 @@ int main(int argc, char **argv) {
                 renderMenu();
             }else if (game->alive > 1){
                 darkenBackground(true);
-                renderText("You died!", 0, height / 2 - (height / 9), red, 2, width / 7);
-                renderText((game->alive == 2) ? "You ran into a wall!" : "Eaten by a ghost!", 0, height / 2 + (height / 10), white, 2, width / 20);
+                renderText("You died!", 0, height / 2 - (height / 5), red, 2, width / 7);
+                renderText((game->alive == 2) ? "You ran into a wall!" : "Eaten by a ghost!", 0, height / 2, white, 2, width / 20);
+                char *scoreText =(char*) malloc(20 * sizeof(char));;
+                sprintf(scoreText, "%s %d", "Score:", game->score);
+                renderText(scoreText, 0, height / 2 + (height / 5), white, 2, width / 20);
+                free(scoreText);
             }
             else if (game->pause){
                 darkenBackground(true);

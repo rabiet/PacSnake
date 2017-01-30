@@ -21,6 +21,8 @@ struct GameState {
     bool running;
     bool pause;
     int pauseTimeout;
+    int score;
+    int maxScore;
 };
 
 #endif
