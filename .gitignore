@@ -1,5 +1,9 @@
+
 # Prerequisites
 *.d
+
+# Program created files
+*.db
 
 # Object files
 *.o
