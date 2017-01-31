@@ -25,7 +25,7 @@ int fieldHeight;
 int fieldWidth;
 int offset;
 bool saved;
-char *name;
+char name[64];
 
 
 struct GameState *resetGame(struct GameState *state){

@@ -31,7 +31,7 @@ int height;
 int width;
 int fieldHeight;
 int fieldWidth;
-char *name;
+char name[64];
 
 char oldHS[1024];
 
