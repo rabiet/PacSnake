@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
     SDL_Texture *turnTexture;
     SDL_Texture *eatWallTexture;
     SDL_Texture *pointTexture;
-    
+
     loadHS();
 
     SDL_Surface *imageLoader = SDL_LoadBMP("ghost.bmp");;
@@ -322,10 +322,12 @@ int main(int argc, char **argv) {
             char *scoreText =(char*) malloc(20 * sizeof(char));;
             sprintf(scoreText, "%s %d", "Length: ", game->score);
             renderText(scoreText, 0, 0, white, 0, (width / 30));
+            free(scoreText);
 
             char *maxScoreText =(char*) malloc(20 * sizeof(char));;
             sprintf(maxScoreText, "%s %d", "Score: ", game->maxScore);
             renderText(maxScoreText, 0, (width / 30) + 5, white, 0, (width / 30));
+            free(maxScoreText);
 
             int moveDown = 0;
             if (game->powerUpSlowerTime != 0)
@@ -334,6 +336,7 @@ int main(int argc, char **argv) {
                 sprintf(slowerText, "%s %d", "Slow Movement:", game->powerUpSlowerTime);
                 renderText(slowerText, offset + (fieldWidth * game->map->width), moveDown * (width / 70) + 5, white, 0, (width / 70));
                 moveDown++;
+                free(slowerText);
             }
             if (game->powerUpFasterTime != 0)
             {
@@ -341,6 +344,7 @@ int main(int argc, char **argv) {
                 sprintf(fasterText, "%s %d", "Fast Movement:", game->powerUpFasterTime);
                 renderText(fasterText, offset + (fieldWidth * game->map->width), moveDown * (width / 70) + 5, white, 0, (width / 70));
                 moveDown++;
+                free(fasterText);
             }
             if (game->powerUpEatGhostsTime != 0)
             {
@@ -348,6 +352,7 @@ int main(int argc, char **argv) {
                 sprintf(eatGhostText, "%s %d", "Eat Ghosts:", game->powerUpEatGhostsTime);
                 renderText(eatGhostText, offset + (fieldWidth * game->map->width), moveDown * (width /70) + 5, white, 0, (width / 70));
                 moveDown++;
+                free(eatGhostText);
             }
             if (game->powerUpEatWallTime != 0)
             {
@@ -355,6 +360,7 @@ int main(int argc, char **argv) {
                 sprintf(eatWallText, "%s %d", "Eat Walls:", game->powerUpEatWallTime);
                 renderText(eatWallText, offset + (fieldWidth * game->map->width), moveDown * (width / 70) + 5, white, 0, (width / 70));
                 moveDown++;
+                free(eatWallText);
             }
 
             if (game->alive == 0)
