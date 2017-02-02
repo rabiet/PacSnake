@@ -52,6 +52,7 @@ void renderText(const char *text, int x, int y, SDL_Color color, int center, int
     }
     SDL_RenderCopy(renderer, textT, NULL, &rect);
     SDL_DestroyTexture(textT);
+    TTF_CloseFont(font);
 }
 
 void darkenBackground(bool black)

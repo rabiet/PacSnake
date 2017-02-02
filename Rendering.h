@@ -18,7 +18,6 @@ SDL_Rect kasten;
 SDL_Color white;
 SDL_Color red;
 
-TTF_Font *font;
 
 void renderTexture(SDL_Texture *texture, int x, int y, int h, int w);
 
