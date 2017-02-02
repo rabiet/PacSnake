@@ -10,12 +10,12 @@ bool saved = false;
 
 void writeHS(struct GameState *state)
 {
-    FILE *f = fopen("highscores.db", "w");
+    FILE *f = fopen("history.db", "w");
     if (f == NULL)
     {
         return;
     }
-    fprintf(f, "%s;%s|%d", oldHS, name, state->score);
+    fprintf(f, "%s|%d;%s", name, state->score, oldHS);
     fclose(f);
     saved = true;
 }
@@ -25,7 +25,7 @@ void loadHS()
     char leaderBoard[1024];
     FILE *fptr;
 
-    if ((fptr = fopen("highscores.db", "r")) == NULL){
+    if ((fptr = fopen("history.db", "r")) == NULL){
        return;
    }
 
@@ -43,7 +43,7 @@ void drawHS()
     char delimiter[] = "|;";
     char *ptr;
     ptr = strtok(string, delimiter);
-    renderText("Highscores", 0, fieldHeight, white, 2, width / 10);
+    renderText("Game History", 0, fieldHeight, white, 2, width / 10);
     int which = 0;
     while(ptr != NULL) 
     {

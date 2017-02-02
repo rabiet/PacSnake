@@ -87,7 +87,6 @@ void getName(struct GameState *state)
         renderText(nam, 0, 0, white, 1, width / 15); 
         SDL_RenderPresent(renderer);
     }
-    if (strcmp(nam, "")) nam = "Name";
     strcpy(name, nam);
 }
 
@@ -134,6 +133,6 @@ void renderMenu()
     renderText("PACSNAKE", -1, fieldHeight, white, 2, height / 5);
     renderText("New Game", -1, height / 2 - (height / 5), (selected == 0) ? red : white, 2, width / 15);
     renderText("Symbols", -1, height / 2 - height / 15, (selected == 1) ? red : white, 2, width / 15);
-    renderText("Highscore", -1, height / 2 + height / 15, selected == 2 ? red : white, 2, width / 15);
+    renderText("Game History", -1, height / 2 + height / 15, selected == 2 ? red : white, 2, width / 15);
     renderText("Exit", -1, height / 2 + (height / 5), (selected == 3) ? red : white, 2, width / 15);
 }
