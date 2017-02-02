@@ -84,9 +84,10 @@ void getName(struct GameState *state)
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         renderText("Name:", 0, height / 2 - (width / 7), white, 2, width / 10);
-        renderText(nam, 0, 0, white, 1, width / 15);
+        renderText(nam, 0, 0, white, 1, width / 15); 
         SDL_RenderPresent(renderer);
     }
+    if (strcmp(nam, "")) nam = "Name";
     strcpy(name, nam);
 }
 

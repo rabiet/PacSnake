@@ -184,9 +184,9 @@ int main(int argc, char **argv) {
             switch (event.key.keysym.sym)
             {
                 case (SDLK_UP):
-                case (SDLK_w): if (game->alive == 1) turnPlayer(game->player, UP); else { if (selected != 0 && game->pauseTimeout == 0) selected--; game->pauseTimeout = 5; } break;
+                case (SDLK_w): if (game->alive == 1) turnPlayer(game->player, UP); else { if (selected != 0 && game->pauseTimeout == 0) { selected--; game->pauseTimeout = 15; } } break;
                 case (SDLK_DOWN):
-                case (SDLK_s): if (game->alive == 1) turnPlayer(game->player, DOWN); else { if (selected != 3 && game->pauseTimeout == 0) selected++; game->pauseTimeout = 5; } break;
+                case (SDLK_s): if (game->alive == 1) turnPlayer(game->player, DOWN); else { if (selected != 3 && game->pauseTimeout == 0) { selected++; game->pauseTimeout = 15; } } break;
                 case (SDLK_LEFT):
                 case (SDLK_a): turnPlayer(game->player, LEFT); break;
                 case (SDLK_RIGHT):
@@ -196,6 +196,8 @@ int main(int argc, char **argv) {
                 case (SDLK_RETURN): handleReturn(game); break;
             }
         }
+
+        if (game->pauseTimeout != 0) game->pauseTimeout--;
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
         SDL_RenderClear(renderer);
 
@@ -253,7 +255,6 @@ int main(int argc, char **argv) {
                 }
             }
 
-            if (game->pauseTimeout != 0) game->pauseTimeout--;
 
             struct PowerUp *powerUp = game->powerUp;
             while(powerUp)
