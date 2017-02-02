@@ -29,7 +29,7 @@ void loadHS()
        return;
    }
 
-   fscanf(fptr, "%s", &leaderBoard);
+   fscanf(fptr, "%1023[0-9a-zA-Z;|!?.,äöü ]", &leaderBoard);
    fclose(fptr);
    strcpy(oldHS, leaderBoard);
    return;
