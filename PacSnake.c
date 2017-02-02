@@ -221,7 +221,7 @@ int main(int argc, char **argv) {
             renderText("Back", fieldHeight, fieldHeight, red, 0, width / 25);
         }else if (game->alive > 1){
             darkenBackground(true);
-            writeHS(game);
+            if (!saved) writeHS(game);
             renderText("You died!", 0, height / 2 - (height / 5), red, 2, width / 7);
             renderText((game->alive == 2) ? "You ran into a wall!" : "Eaten by a ghost!", 0, height / 2, white, 2, width / 20);
             char *scoreText =(char*) malloc(20 * sizeof(char));;

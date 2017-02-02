@@ -11,6 +11,7 @@ bool saved = false;
 
 void writeHS(struct GameState *state)
 {
+    loadHS();
     FILE *f = fopen("history.db", "w");
     if (f == NULL)
     {
