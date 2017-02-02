@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include <SDL2/SDL.h>
 
 
@@ -45,7 +46,7 @@ void drawHS()
     ptr = strtok(string, delimiter);
     renderText("Game History", 0, fieldHeight, white, 2, width / 10);
     int which = 0;
-    while(ptr != NULL) 
+    while(ptr != NULL)
     {
         renderText(ptr, 0, (height / 4) + ((which / 2) * (width / 20)), white, (which % 2) == 0 ? 3 : 4, width / 30);
         which++;
