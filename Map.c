@@ -41,7 +41,7 @@ int loadMap(struct GameState *state) {
     while ((c = fgetc(mapFile)), c != '\n' && c != EOF) {
         if (j >= 4) {
             printf("Too large Mapsize\n");
-            return NULL;
+            return -1;
         } else if (c == ',') {
             lengths[j] = '\0';
             sscanf(lengths, "%d", &length);
