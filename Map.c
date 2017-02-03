@@ -21,7 +21,7 @@ void printMapToConsole(struct Map *map) {
 int loadMap(struct GameState *state) {
     FILE *mapFile;
 
-    mapFile = fopen("map.txt", "r");
+    mapFile = fopen("Map.txt", "r");
 
     if (!mapFile) {
         printf("Error while reading file map.txt\n");
