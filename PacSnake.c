@@ -138,35 +138,35 @@ int main(int argc, char **argv) {
 
     loadHS();
 
-    SDL_Surface *imageLoader = SDL_LoadBMP("ghost.bmp");;
+    SDL_Surface *imageLoader = SDL_LoadBMP("textures/ghost.bmp");;
     ghostTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
     SDL_FreeSurface(imageLoader);
 
-    imageLoader = SDL_LoadBMP("eatEnemy.bmp");;
+    imageLoader = SDL_LoadBMP("textures/eatEnemy.bmp");;
     eatEnemyTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
     SDL_FreeSurface(imageLoader);
 
-    imageLoader = SDL_LoadBMP("speedUp.bmp");;
+    imageLoader = SDL_LoadBMP("textures/speedUp.bmp");;
     speedUpTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
     SDL_FreeSurface(imageLoader);
 
-    imageLoader = SDL_LoadBMP("speedDown.bmp");;
+    imageLoader = SDL_LoadBMP("textures/speedDown.bmp");;
     speedDownTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
     SDL_FreeSurface(imageLoader);
 
-    imageLoader = SDL_LoadBMP("home.bmp");
+    imageLoader = SDL_LoadBMP("textures/home.bmp");
     homeTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
     SDL_FreeSurface(imageLoader);
 
-    imageLoader = SDL_LoadBMP("turn.bmp");
+    imageLoader = SDL_LoadBMP("textures/turn.bmp");
     turnTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
     SDL_FreeSurface(imageLoader);
 
-    imageLoader = SDL_LoadBMP("eatWall.bmp");
+    imageLoader = SDL_LoadBMP("textures/eatWall.bmp");
     eatWallTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
     SDL_FreeSurface(imageLoader);
 
-    imageLoader = SDL_LoadBMP("points.bmp");
+    imageLoader = SDL_LoadBMP("textures/points.bmp");
     pointTexture = SDL_CreateTextureFromSurface(renderer, imageLoader);
     SDL_FreeSurface(imageLoader);
 
