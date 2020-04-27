@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
     SDL_FreeSurface(imageLoader);
 
 
-    int i = 0;
+    uint32_t lastMovement = 0;
     SDL_Event event;
 
 
@@ -372,14 +372,13 @@ int main(int argc, char **argv) {
                 darkenBackground(true);
                 renderText("GAME PAUSED", 0, 0, white, 1, 0);
             }else{
-                if (i == game->speed)
+                if (lastMovement + (game->speed * 16.6) < SDL_GetTicks())
                 {
-                    i = 0;
+                    lastMovement = SDL_GetTicks();
                     movePlayer(game->player, game);
                     moveGhosts(game->ghost, game);
                     updateTimedPowerUps(game);
                 }
-                i++;
             }
         }
         SDL_RenderPresent(renderer);
