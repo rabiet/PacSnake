@@ -193,7 +193,7 @@ int main(int argc, char **argv) {
                 case (SDLK_d): turnPlayer(game->player, RIGHT); break;
                 case (SDLK_BACKSPACE): game->alive = 0; break;
                 case (SDLK_ESCAPE): game->running = false; break;
-                case (SDLK_RETURN): handleReturn(game); break;
+                case (SDLK_RETURN): if (event.type == SDL_KEYUP) handleReturn(game); break;
             }
         }
 

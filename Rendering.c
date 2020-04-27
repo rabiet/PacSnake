@@ -72,7 +72,8 @@ void getName(struct GameState *state)
     while (!done) {
         SDL_Event event;
         if (SDL_PollEvent(&event)) {
-            if (event.key.keysym.sym == SDLK_RETURN && state->pauseTimeout == 0) { done = true; }
+            if (event.key.keysym.sym == SDLK_RETURN && event.type == SDL_KEYUP) { done = true; }
+            if (event.key.keysym.sym == SDLK_BACKSPACE && event.type == SDL_KEYDOWN) nam[strlen(nam) - 1] = 0;
             switch (event.type) {
                 case SDL_QUIT:
                     done = true;
@@ -82,7 +83,6 @@ void getName(struct GameState *state)
                     break;
             }
         }
-        if (state->pauseTimeout != 0) state->pauseTimeout--;
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         renderText("Name:", 0, height / 2 - (width / 7), white, 2, width / 10);
