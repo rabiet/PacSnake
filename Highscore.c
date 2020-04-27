@@ -9,49 +9,94 @@
 
 bool saved = false;
 
-void writeHS(struct GameState *state)
+void addHS(struct highscore *newHs)
 {
-    loadHS();
-    FILE *f = fopen("history.db", "w");
-    if (f == NULL)
-    {
-        return;
+    if (hs == NULL)
+        hs = newHs;
+    else {
+        if (hs->score < newHs->score)
+        {
+            newHs->next = hs;
+            hs = newHs;
+        } else {
+            struct highscore* current = hs;
+            while (current->next != NULL && current->next->score > newHs->score)
+                current = current->next;
+
+            newHs->next = current->next;
+            current->next = newHs;
+        }
     }
-    fprintf(f, "%s|%d;%s", name, state->score, oldHS);
-    fclose(f);
-    saved = true;
 }
 
 void loadHS()
 {
-    char leaderBoard[1024];
+    struct highscore *toDelete = hs;
+    while (toDelete != NULL)
+    {
+        hs = toDelete->next;
+        free(toDelete);
+        toDelete = hs;
+    }
+    char leaderBoard[4096];
     FILE *fptr;
 
     if ((fptr = fopen("history.db", "r")) == NULL){
        return;
    }
 
-   fscanf(fptr, "%1023[0-9a-zA-Z;|!?.,äöü ]", &leaderBoard);
+    char name[256];
+    int score = 0;
+    while (fscanf(fptr, " %[0-9a-zA-zäöüÄÖÜ !?]|%d;", name, &score) != EOF)
+    {
+        struct highscore *newHS = malloc(sizeof(struct highscore));
+        strcpy(newHS->name, name);
+        newHS->score = score;
+        newHS->next = NULL;
+        addHS(newHS);
+    }
+
    fclose(fptr);
-   strcpy(oldHS, leaderBoard);
-   return;
 }
 
 void drawHS()
 {
     darkenBackground(true);
-    char string[1024];
-    strcpy(string, oldHS);
-    char delimiter[] = "|;";
-    char *ptr;
-    ptr = strtok(string, delimiter);
     renderText("Game History", 0, fieldHeight, white, 2, width / 10);
-    int which = 0;
-    while(ptr != NULL)
+    struct highscore *current = hs;
+    int i = 0;
+    while(current != NULL && i < 10)
     {
-        renderText(ptr, 0, (height / 4) + ((which / 2) * (width / 20)), white, (which % 2) == 0 ? 3 : 4, width / 30);
-        which++;
-     	ptr = strtok(NULL, delimiter);
-        if (which == 16) ptr = NULL;
+        renderText(current->name, 0, (height / 4) + (i * (height / 16)), white, 3, width / 30);
+        char scoreString[10];
+        sprintf(scoreString, "%d", current->score);
+        renderText(scoreString, 0, (height / 4) + (i * (height / 16)), white, 4, width / 30);
+        current = current->next;
+        i++;
     }
+}
+
+void writeHS(struct GameState *state)
+{
+    loadHS();
+    struct highscore *newHs = malloc(sizeof(struct highscore));
+    newHs->score = state->maxScore;
+    strcpy(newHs->name, name);
+    addHS(newHs);
+
+    FILE *f = fopen("history.db", "w");
+    if (f == NULL)
+    {
+        return;
+    }
+    struct highscore *current = hs;
+    while(current != NULL)
+    {
+        fprintf(f, "%s|%d;", current->name, current->score);
+        current = current->next;
+    }
+
+    
+    fclose(f);
+    saved = true;
 }

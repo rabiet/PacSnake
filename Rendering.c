@@ -87,6 +87,7 @@ void getName(struct GameState *state)
         renderText(nam, 0, 0, white, 1, width / 15); 
         SDL_RenderPresent(renderer);
     }
+    SDL_StopTextInput();
     strcpy(name, nam);
 }
 

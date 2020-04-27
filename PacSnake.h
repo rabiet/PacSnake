@@ -33,7 +33,7 @@ int fieldHeight;
 int fieldWidth;
 char name[64];
 
-char oldHS[1024];
+struct highscore *hs;
 
 struct SDL_Renderer *renderer;
 
