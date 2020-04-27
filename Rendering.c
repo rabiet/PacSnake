@@ -74,14 +74,12 @@ void getName(struct GameState *state)
         if (SDL_PollEvent(&event)) {
             if (event.key.keysym.sym == SDLK_RETURN && event.type == SDL_KEYUP) { done = true; }
             if (event.key.keysym.sym == SDLK_BACKSPACE && event.type == SDL_KEYDOWN) nam[strlen(nam) - 1] = 0;
-            switch (event.type) {
-                case SDL_QUIT:
-                    done = true;
-                    break;
-                case SDL_TEXTINPUT:
-                    strcat(nam, event.text.text);
-                    break;
+            if (event.key.keysym.sym == SDLK_ESCAPE && event.type == SDL_KEYDOWN) 
+            {
+                state->running = false;
+                return;
             }
+            if (event.type == SDL_TEXTINPUT) strcat(nam, event.text.text);
         }
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
