@@ -72,7 +72,12 @@ void getName(struct GameState *state)
     while (!done) {
         SDL_Event event;
         if (SDL_PollEvent(&event)) {
-            if (event.key.keysym.sym == SDLK_RETURN && event.type == SDL_KEYUP) { done = true; }
+            if (event.key.keysym.sym == SDLK_RETURN && event.type == SDL_KEYUP) 
+            { 
+                if(nam[0] == 0) 
+                    continue; 
+                done = true; 
+            }
             if (event.key.keysym.sym == SDLK_BACKSPACE && event.type == SDL_KEYDOWN) nam[strlen(nam) - 1] = 0;
             if (event.key.keysym.sym == SDLK_ESCAPE && event.type == SDL_KEYDOWN) 
             {
