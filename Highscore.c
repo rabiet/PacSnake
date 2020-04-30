@@ -82,6 +82,7 @@ void writeHS(struct GameState *state)
     struct highscore *newHs = malloc(sizeof(struct highscore));
     newHs->score = state->maxScore;
     strcpy(newHs->name, name);
+    newHs->next = NULL;
     addHS(newHs);
 
     FILE *f = fopen("history.db", "w");
