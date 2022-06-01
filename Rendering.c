@@ -49,6 +49,7 @@ void renderText(const char *text, int x, int y, SDL_Color color, int center, int
         case 2: rect.x = width / 2 - rect.w / 2; rect.y = y; break;                         // Centered horizontally
         case 3: rect.x = width / 5; rect.y = y; break;
         case 4: rect.x = width - width / 5 - rect.w; rect.y = y; break;
+        case 5: rect.x = width / 2 - rect.w / 2 + x; rect.y = height / 2 - rect.h / 2 + y; break;   // Offset from center of the screen
     }
     SDL_RenderCopy(renderer, textT, NULL, &rect);
     SDL_DestroyTexture(textT);
@@ -95,6 +96,44 @@ void getName(struct GameState *state)
     strcpy(name, nam);
 }
 
+void getDifficulty(struct GameState *state) {
+    bool done = false;
+    while (!done) {
+        SDL_Event event;
+        if (SDL_PollEvent(&event)) {
+            if (event.key.keysym.sym == SDLK_RETURN && event.type == SDL_KEYUP) 
+            {
+                done = true; 
+            }
+            if (event.key.keysym.sym == SDLK_ESCAPE && event.type == SDL_KEYDOWN) 
+            {
+                state->running = false;
+                return;
+            }
+            if (event.key.keysym.sym == SDLK_LEFT && event.type == SDL_KEYDOWN) 
+            {
+                if (state->difficulty != 1)
+                    state->difficulty--;
+            }
+
+            if (event.key.keysym.sym == SDLK_RIGHT && event.type == SDL_KEYDOWN) 
+            {
+                if (state->difficulty != 3)
+                    state->difficulty++;
+            }
+        }
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        renderText("Difficulty:", 0, height / 2 - (width / 7), white, 2, width / 10);
+        renderText("Easy", -width / 4, 0, state->difficulty == 1 ? red : white, 5, width / 15);
+        renderText("Normal", 0, 0, state->difficulty == 2 ? red : white, 5, width / 15);
+        renderText("Hard", width / 4, 0, state->difficulty == 3 ? red : white, 5, width / 15);
+        renderText("A higher difficulty means more points", 0, height / 2 + (width / 7), white, 2, width / 30);
+        renderText("but also higher speed", 0, height / 2 + (width / 7) + (width / 30), white, 2, width / 30);
+        SDL_RenderPresent(renderer);
+    }
+}
+
 void handleReturn(struct GameState *state)
 {
     if (state->alive == 0 && state->pauseTimeout == 0)
@@ -103,8 +142,9 @@ void handleReturn(struct GameState *state)
         {
             case 0:
                 state->pauseTimeout = 30;
-                getName(state);
                 state = resetGame(state);
+                getName(state);
+                getDifficulty(state);
                 state->alive = 1;
                 break;
             case 1:

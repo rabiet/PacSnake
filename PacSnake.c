@@ -24,7 +24,6 @@ int height;
 int fieldHeight;
 int fieldWidth;
 int offset;
-int difficulty = 2;
 bool saved;
 char name[64];
 struct highscore *hs;
@@ -237,7 +236,7 @@ int main(int argc, char **argv) {
             {
                 for (int j = 0; j < game->map->width; j++)
                 {
-                    // let the walls blink if the eat wall powerup is active
+                    // let the walls flash if the eat wall powerup is active
                     if(game->powerUpEatWallTime <= 0){
                         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
                     }else{
@@ -316,7 +315,7 @@ int main(int argc, char **argv) {
                 curscore++;
             }
 
-            int score = curscore * difficulty;
+            int score = curscore * game->difficulty;
 
             if (score > game->maxScore) {
                 game->maxScore = score;
