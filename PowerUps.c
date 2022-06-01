@@ -6,6 +6,9 @@
 #include "Map.h"
 #include "Player.h"
 
+const int speedUpAmount = 6;
+const int speedDownAmount = 20;
+
 void printPowerUps(struct PowerUp *powerUp1){
     struct PowerUp *powerUp = powerUp1;
 
@@ -81,15 +84,9 @@ void takePowerup(struct PowerUp *powerUp, struct GameState *state){
             state->powerUpEatGhostsTime += powerUp->time;
             break;
         case SLOWER:
-            if(state->powerUpSlowerTime == 0){
-                state->speed += 10;
-            }
             state->powerUpSlowerTime += powerUp->time;
             break;
         case FASTER:
-            if(state->powerUpFasterTime == 0){
-                state->speed -= 3;
-            }
             state->powerUpFasterTime += powerUp->time;
             break;
         case GHOSTS_TO_CENTER:
@@ -146,14 +143,6 @@ void takePowerupPos(struct Position pos, struct GameState *state){
 }
 
 void updateTimedPowerUps(struct GameState *state){
-    if(state->powerUpSlowerTime == 1){
-        state->speed -= 10;
-    }
-
-    if(state->powerUpFasterTime == 1){
-        state->speed += 5;
-    }
-
     if(state->powerUpSlowerTime > 0){
         state->powerUpSlowerTime--;
     }
@@ -192,4 +181,16 @@ void setPowerUpSDLRenderColor(struct SDL_Renderer *renderer, struct PowerUp *pow
             SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
             break;
     }
+}
+
+int getGameSpeed(struct GameState *state) {
+    int speed = state->speed;
+
+    if (state->powerUpSlowerTime > 0) {
+        speed += speedDownAmount;
+    }
+    if (state->powerUpFasterTime > 0) {
+        speed -= speedUpAmount;
+    }
+    return speed / state->difficulty;
 }

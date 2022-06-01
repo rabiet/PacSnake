@@ -13,6 +13,7 @@ struct GameState {
     struct Player *player;
     struct PowerUp *powerUp;
     int speed;
+    int difficulty;
     int powerUpSlowerTime;
     int powerUpFasterTime;
     int powerUpEatGhostsTime;

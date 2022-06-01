@@ -24,6 +24,7 @@ int height;
 int fieldHeight;
 int fieldWidth;
 int offset;
+int difficulty = 2;
 bool saved;
 char name[64];
 struct highscore *hs;
@@ -77,7 +78,8 @@ struct GameState *resetGame(struct GameState *state){
     state->pauseTimeout = 60;
     state->score = 0;
     state->maxScore = 0;
-    state->speed = 15;
+    state->speed = 30;
+    state->difficulty = 2;
     state->powerUpSlowerTime = 0;
     state->powerUpFasterTime = 0;
     state->powerUpEatGhostsTime = 0;
@@ -219,7 +221,7 @@ int main(int argc, char **argv) {
             renderText("Enlarges you and raises your score", fieldHeight * 10, fieldHeight * 27, white, 0, width / 30);
 
             renderText("Back", fieldHeight, fieldHeight, red, 0, width / 25);
-        }else if (game->alive > 1){
+        } else if (game->alive > 1) {
             darkenBackground(true);
             if (!saved) { writeHS(game); }
             renderText("You died!", 0, height / 2 - (height / 5), red, 2, width / 7);
@@ -228,9 +230,9 @@ int main(int argc, char **argv) {
             sprintf(scoreText, "%s %d", "Score:", game->maxScore);
             renderText(scoreText, 0, height / 2 + (height / 5), white, 2, width / 20);
             free(scoreText);
-        }else if (game->alive == -1){
+        } else if (game->alive == -1) {
             drawHS();
-        }else{
+        } else {
             for (int k = 0; k < game->map->length; k++)
             {
                 for (int j = 0; j < game->map->width; j++)
@@ -314,8 +316,10 @@ int main(int argc, char **argv) {
                 curscore++;
             }
 
-            if(curscore > game->maxScore){
-                game->maxScore = curscore;
+            int score = curscore * difficulty;
+
+            if (score > game->maxScore) {
+                game->maxScore = score;
             }
 
             game->score = curscore;
@@ -372,7 +376,7 @@ int main(int argc, char **argv) {
                 darkenBackground(true);
                 renderText("GAME PAUSED", 0, 0, white, 1, 0);
             }else{
-                if (lastMovement + (game->speed * 16.6) < SDL_GetTicks())
+                if (lastMovement + (getGameSpeed(game) * 16.6) < SDL_GetTicks())
                 {
                     lastMovement = SDL_GetTicks();
                     movePlayer(game->player, game);
