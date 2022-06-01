@@ -4,8 +4,9 @@ CC=gcc
 # also the SDL2_ttf files from the include folder are copied to SDL2\x86_64-w64-mingw32\include\SDL2
 # and the files from SDL2_ttf\lib\x86 to SDL2\x86_64-w64-mingw32\lib
 CFLAGS=-I".\SDL2\x86_64-w64-mingw32\include" -std=c99
+LinCFLAGS=-I".\SDL2\x86_64-w64-mingw32\include" -std=c99
 LDFLAGS=-L".\SDL2\x86_64-w64-mingw32\lib" -lmingw32 -lSDL2main -lSDL2_ttf -lSDL2 -lopengl32
-LinFLAGS=-L".\SDL2\x86_64-w64-mingw32\lib" -lSDL2main -lSDL2_ttf -lSDL2
+LinFLAGS=-lSDL2main -lSDL2_ttf -lSDL2
 
 all: run
 
@@ -16,7 +17,7 @@ build:
 	$(CC) $(CFLAGS) -o PacSnake.exe PacSnake.c Ghosts.c Player.c PowerUps.c Map.c Position.c Highscore.c Rendering.c $(LDFLAGS)
 
 build-linux:
-	$(CC) $(CFLAGS) -o PacSnake.exe PacSnake.c Ghosts.c Player.c PowerUps.c Map.c Position.c Highscore.c Rendering.c $(LinFLAGS)
+	$(CC) $(LinCFLAGS) -o PacSnake.exe PacSnake.c Ghosts.c Player.c PowerUps.c Map.c Position.c Highscore.c Rendering.c $(LinFLAGS)
 
 run: PacSnake.exe
-	PacSnake.exe
+	./PacSnake.exe

@@ -27,14 +27,14 @@ struct GameState {
 
 struct GameState *resetGame(struct GameState *state);
 
-int height;
-int width;
-int fieldHeight;
-int fieldWidth;
-char name[64];
+extern int height;
+extern int width;
+extern int fieldHeight;
+extern int fieldWidth;
+extern char name[64];
 
-struct highscore *hs;
+extern struct highscore *hs;
 
-struct SDL_Renderer *renderer;
+extern struct SDL_Renderer *renderer;
 
 #endif

@@ -26,7 +26,7 @@ int fieldWidth;
 int offset;
 bool saved;
 char name[64];
-
+struct highscore *hs;
 
 struct GameState *resetGame(struct GameState *state){
     // free old ghosts

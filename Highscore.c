@@ -7,7 +7,7 @@
 #include <SDL2/SDL.h>
 
 
-bool saved = false;
+extern bool saved;
 
 void addHS(struct highscore *newHs)
 {

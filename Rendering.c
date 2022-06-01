@@ -16,7 +16,6 @@
 
 int selected = 0;
 
-bool saved;
 SDL_Rect kasten;
 
 SDL_Color white = {255, 255, 255, 255};

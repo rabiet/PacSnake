@@ -14,7 +14,7 @@ struct highscore {
     struct highscore *next;
 };
 
-bool saved;
+extern bool saved;
 
 void addHS(struct highscore * newHs);
 

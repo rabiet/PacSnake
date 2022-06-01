@@ -11,12 +11,12 @@
 #include <SDL2/SDL_ttf.h>
 
 
-int selected;
+extern int selected;
 
-SDL_Rect kasten;
+extern SDL_Rect kasten;
 
-SDL_Color white;
-SDL_Color red;
+extern SDL_Color white;
+extern SDL_Color red;
 
 
 void renderTexture(SDL_Texture *texture, int x, int y, int h, int w);
